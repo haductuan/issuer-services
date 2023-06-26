@@ -1,0 +1,3711 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Issuer server",
+    "description": "*List APIs for Issuer Portal* \n ## Introduction \n This API is documented for **Issuer Server**. \n ## Authentication \n **Issuer server** use **Jwz Token** for authentication.",
+    "version": "1.0"
+  },
+  "tags": [
+    {
+      "name": "auth",
+      "description": "*List APIs for authentication.*"
+    },
+    {
+      "name": "issuers",
+      "description": "*List APIs to manager your Issuers.*"
+    },
+    {
+      "name": "did",
+      "description": "*List APIs for DIDs.*"
+    },
+    {
+      "name": "claims",
+      "description": "*List APIs for Claims.*"
+    },
+    {
+      "name": "schemas",
+      "description": "*List APIs to manager Schemas.*"
+    },
+    {
+      "name": "registries",
+      "description": "*List APIs to manager Registry Services.*"
+    },
+    {
+      "name": "networks",
+      "description": "*List APIs to config networks.*"
+    }
+  ],
+  "paths": {
+    "/api/v1/auth/login/{issuerId}": {
+      "post": {
+        "operationId": "auth-1",
+        "security": [
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "description": "Get JWZ token for login",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer Server that you want to login to.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "You must send your ZKProofs for login to Issuer Server.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Your JWZ Token.",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Your JWZ Token.",
+                      "example": "123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify-token/{issuerId}": {
+      "post": {
+        "operationId": "auth-2",
+        "security": [
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Verify Token",
+        "description": "Verify a JWZ Token and return true if this token is valid.",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer Server what you want to login to.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Your jwz token",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyToken"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Result check your JWZ Token",
+                  "properties": {
+                    "isValid": {
+                      "type": "boolean",
+                      "description": "Return true if your JWZ token is valid, else return false",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/proof/{claimId}": {
+      "get": {
+        "operationId": "auth-3",
+        "security": [
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Generate proof input",
+        "description": "Generate proof input for claim login",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "Your claimId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "type in (mtp, nonRevMtp)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "mtp",
+              "enum": [
+                "mtp",
+                "nonRevMtp"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "KYC Input",
+                  "type": "object",
+                  "properties": {
+                    "kycQueryMTPInput": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/issuers": {
+      "get": {
+        "operationId": "issuers-1",
+        "security": [
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Get all issuers infor",
+        "description": "API to get all issuers is registed in this server.",
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Information of all Issuers",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "issuerId": {
+                        "type": "string",
+                        "description": "DID of Issuers.",
+                        "example": "123456"
+                      },
+                      "numPublishClaims": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Number Claims that Issuer published.",
+                        "example": 10
+                      },
+                      "numHolders": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Number Holders in this Issuer Servers.",
+                        "example": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/issuers/register": {
+      "post": {
+        "operationId": "issuers-2",
+        "security": [
+
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Register new issuer",
+        "description": "Register a new Issuer by PublicKey",
+        "requestBody": {
+          "description": "Issuer's publicKey",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Holder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Issuer information",
+                  "type": "object",
+                  "properties": {
+                    "issuerId": {
+                      "type": "string",
+                      "description": "DID of Issuer",
+                      "example": "12345"
+                    },
+                    "claimId": {
+                      "type": "string",
+                      "description": "Id of Claims to generate input for zkProof Login to this Issuer.",
+                      "example": "id123"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Version of claim",
+                      "example": 1
+                    },
+                    "revNonce": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Revocation nonce of claim",
+                      "example": 10
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/issuers/{issuerId}/restore-last-state": {
+      "put": {
+        "operationId": "issuers-3",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Restore lastest statet",
+        "description": "Restore latest state in block chain of Issuer",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/issuers/{issuerId}/operators": {
+      "post": {
+        "operationId": "issuers-4",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Create operator",
+        "description": "Issuer create a Operator",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Operator"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Information of Operator",
+                  "type": "object",
+                  "properties": {
+                    "issuerId": {
+                      "type": "string",
+                      "description": "DID of Issuer",
+                      "example": "1234"
+                    },
+                    "userId": {
+                      "type": "string",
+                      "description": "DID of Operator",
+                      "example": "6789"
+                    },
+                    "claimId": {
+                      "type": "string",
+                      "description": "Id of Claims to generate input for zkProof Login to this Issuer.",
+                      "example": "id123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "issuers-5",
+        "security": [
+
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Get list operator",
+        "description": "Get all Operator's information of Issuer",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "description": "Operator's information",
+                    "type": "object",
+                    "properties": {
+                      "userId": {
+                        "description": "DID of Operator",
+                        "type": "string",
+                        "example": "1234"
+                      },
+                      "role": {
+                        "description": "Role of Operator (Admin or Operator)",
+                        "type": "integer",
+                        "format": "int64",
+                        "enum": [
+                          0,
+                          1
+                        ]
+                      },
+                      "claimId": {
+                        "description": "Id of Claims to generate input for zkProof to login to this Issuer.",
+                        "type": "string",
+                        "example": "id123"
+                      },
+                      "issuerId": {
+                        "description": "DID of Issuer",
+                        "type": "string",
+                        "example": "1234"
+                      },
+                      "activate": {
+                        "description": "True if this Operator is active",
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "activateDate": {
+                        "description": "Time stamp when this Operator is created",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "1681355391"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/issuers/{issuerId}/operators/{operatorId}": {
+      "get": {
+        "operationId": "issuers-6",
+        "security": [],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Get operator infor",
+        "description": "Get operator infor",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          },
+          {
+            "name": "operatorId",
+            "in": "path",
+            "description": "DID of Operator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Operator's information",
+                  "properties": {
+                    "userId": {
+                      "type": "string",
+                      "description": "DID of User",
+                      "example": "1234"
+                    },
+                    "issuerId": {
+                      "type": "string",
+                      "description": "DID of Issuer",
+                      "example": "1234"
+                    },
+                    "role": {
+                      "description": "Role of Operator (Admin or Operator)",
+                      "type": "integer",
+                      "format": "int64",
+                      "enum": [
+                        0,
+                        1
+                      ]
+                    },
+                    "claimId": {
+                      "type": "string",
+                      "description": "Id of Claims to generate input for zkProof Login to this Issuer.",
+                      "example": "id123"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Version of claim",
+                      "example": 1
+                    },
+                    "revNonce": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Revocation nonce of claim",
+                      "example": 10
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "issuers-7",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Disable operator",
+        "description": "Disable a operator",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          },
+          {
+            "name": "operatorId",
+            "in": "path",
+            "description": "DID of operator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/issuers/{issuerId}/profile": {
+      "get": {
+        "operationId": "issuers-9",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Get Issuer information",
+        "description": "Get information of a Issuer",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Issuer information",
+                  "type": "object",
+                  "properties": {
+                    "issuerId": {
+                      "type": "string",
+                      "description": "DID of Issuers.",
+                      "example": "123456"
+                    },
+                    "numPublishClaims": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Number Claims that Issuer published.",
+                      "example": 10
+                    },
+                    "numHolders": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Number Holders in this Issuer Servers.",
+                      "example": 10
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/issuers/{issuerId}/lastest-state": {
+      "get": {
+        "operationId": "issuers-10",
+        "security": [
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Get Issuer Auth Claim Path",
+        "description": "Get lastest auth claim path of issuers",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Issuer Auth Claim Path",
+                  "type": "object",
+                  "properties": {
+                    "claimsRoot": {
+                      "type": "string",
+                      "example": "0"
+                    },
+                    "claimRevRoot": {
+                      "type": "string",
+                      "example": "0"
+                    },
+                    "expectedState": {
+                      "type": "string",
+                      "example": "0"
+                    }     
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/did/kyc": {
+      "get": {
+        "operationId": "did-1",
+        "security": [
+        ],
+        "tags": [
+          "did"
+        ],
+        "summary": "Get KYC Registry Infor",
+        "description": "Get KYC Registry Infor",
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Issuer Auth Claim Path",
+                  "type": "object",
+                  "properties": {
+                    "issuerId": {
+                      "type": "string",
+                      "description": "Id of Kyc Issuer",
+                      "example": "123"
+                    },
+                    "registryId": {
+                      "type": "string",
+                      "description": "Id of registry service",
+                      "example": "123"
+                    },
+                    "schemaHash": {
+                      "type": "string",
+                      "description": "Hash of Id Card Schema",
+                      "example": "123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/did": {
+      "post": {
+        "operationId": "did-2",
+        "security": [
+        ],
+        "tags": [
+          "did"
+        ],
+        "summary": "Register new DID",
+        "description": "Register new DID",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "DID of user",
+                    "example": "12345"
+                  },
+                  "pubkeyX": {
+                    "type": "string",
+                    "description": "Your PublicKeyX",
+                    "example": "12345"
+                  },
+                  "pubkeyY": {
+                    "type": "string",
+                    "description": "Your PublicKeyY",
+                    "example": "12345"
+                  },
+                  "publicKey": {
+                    "type": "string",
+                    "description": "Your publicKey to encode your data",
+                    "example": "12345"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Issuer Auth Claim Path",
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "string",
+                      "description": "DID of user",
+                      "example": "12345"
+                    },
+                    "pubkeyX": {
+                      "type": "string",
+                      "description": "Your PublicKeyX",
+                      "example": "12345"
+                    },
+                    "pubkeyY": {
+                      "type": "string",
+                      "description": "Your PublicKeyY",
+                      "example": "12345"
+                    },
+                    "publicKey": {
+                      "type": "string",
+                      "description": "Your publicKey to encode your data",
+                      "example": "12345"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/did/resolve/{userId}": {
+      "get": {
+        "operationId": "did-3",
+        "security": [],
+        "tags": [
+          "did"
+        ],
+        "summary": "Get user id information",
+        "description": "Get user id information",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Your user id",
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Issuer Auth Claim Path",
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "string",
+                      "description": "DID of user",
+                      "example": "12345"
+                    },
+                    "pubkeyX": {
+                      "type": "string",
+                      "description": "Your PublicKeyX",
+                      "example": "12345"
+                    },
+                    "pubkeyY": {
+                      "type": "string",
+                      "description": "Your PublicKeyY",
+                      "example": "12345"
+                    },
+                    "publicKey": {
+                      "type": "string",
+                      "description": "Your publicKey to encode your data",
+                      "example": "12345"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims": {
+      "get": {
+        "operationId": "claims-1",
+        "security": [],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Query claims",
+        "description": "Search claims by issuerId, status, holderId, schemaHash or claimId",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "query",
+            "description": "DID of Issuer",
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "search by PENDING | ACTIVE | REVIEWING | REJECT | PENDING_REVOKE | REVOKED",
+            "schema": {
+              "type": "array", 
+              "items": {
+                "type": "string",
+                "description": "search by PENDING | ACTIVE | REVIEWING | REJECT | PENDING_REVOKE | REVOKED"
+              }
+            }
+          },
+          {
+            "name": "holderId",
+            "in": "query",
+            "description": "DID of Holder",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "schemaHash",
+            "in": "query",
+            "description": "search by schemaHash",
+            "schema": {
+              "type": "string",
+              "example": "12345"
+            }
+          },
+          {
+            "name": "claimId",
+            "in": "query",
+            "description": "Find claim by List claimIds",
+            "schema": {
+              "type": "array", 
+              "items": {
+                "type": "string",
+                "description": "search by ClaimIds"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Claim's information",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "claimId": {
+                        "type": "string",
+                        "description": "Id of claim",
+                        "example": "id123"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "Claim status",
+                        "enum": [
+                          "PENDING", "ACTIVE", "REVIEWING", "REJECT", "PENDING_REVOKE", "REVOKED"
+                        ]
+                      },
+                      "holderId": {
+                        "type": "string",
+                        "description": "DID of Holder who owns this claim",
+                        "example": "1234"
+                      },
+                      "issuerId": {
+                        "type": "string",
+                        "description": "DID of Issuer who issues this claim",
+                        "example": "1234"
+                      },
+                      "schemaHash": {
+                        "type": "string",
+                        "description": "SchemaHash of Claim",
+                        "example": "1234"
+                      },
+                      "createAt": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Time stamp when claim actived",
+                        "example": "1681355391"
+                      },
+                      "revNonce": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Revocation Nonce of Claim",
+                        "example": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/{issuerId}/raw-data": {
+      "get": {
+        "operationId": "claims-15",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Issuer get claim's raw data",
+        "description": "Issuer get claim's raw data",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer",
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "search by PENDING | ACTIVE | REVIEWING | REJECT | PENDING_REVOKE | REVOKED",
+            "schema": {
+              "type": "array", 
+              "items": {
+                "type": "string",
+                "description": "search by PENDING | ACTIVE | REVIEWING | REJECT | PENDING_REVOKE | REVOKED"
+              }
+            }
+          },
+          {
+            "name": "holderId",
+            "in": "query",
+            "description": "DID of Holder",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "schemaHash",
+            "in": "query",
+            "description": "search by schemaHash",
+            "schema": {
+              "type": "string",
+              "example": "12345"
+            }
+          },
+          {
+            "name": "claimId",
+            "in": "query",
+            "description": "Find claim by List claimIds",
+            "schema": {
+              "type": "array", 
+              "items": {
+                "type": "string",
+                "description": "search by ClaimIds"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Claim's information",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "claimId": {
+                        "type": "string",
+                        "description": "Id of claim",
+                        "example": "id123"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "Claim status",
+                        "enum": [
+                          "PENDING", "ACTIVE", "REVIEWING", "REJECT", "PENDING_REVOKE", "REVOKED"
+                        ]
+                      },
+                      "holderId": {
+                        "type": "string",
+                        "description": "DID of Holder who owns this claim",
+                        "example": "1234"
+                      },
+                      "issuerId": {
+                        "type": "string",
+                        "description": "DID of Issuer who issues this claim",
+                        "example": "1234"
+                      },
+                      "schemaHash": {
+                        "type": "string",
+                        "description": "SchemaHash of Claim",
+                        "example": "1234"
+                      },
+                      "createAt": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Time stamp when claim actived",
+                        "example": "1681355391"
+                      },
+                      "revNonce": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Revocation Nonce of Claim",
+                        "example": 10
+                      },
+                      "rawData": {
+                        "type": "object",
+                        "description": "User data that create claims",
+                        "example": {
+                          "dateOfBirth": 20000101,
+                          "address": "address"
+                        }
+                      },
+                      "imagesUrl": {
+                        "type": "array",
+                        "description": "List images url",
+                        "items": {
+                          "type": "string",
+                          "description": "Images url",
+                          "example": "https://example.images.url"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/{claimId}/retrieve": {
+      "get": {
+        "operationId": "claims-2",
+        "security": [],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Retrieve claims data from claimId",
+        "description": "Entry and Raw data of claim that Issuer isse for holder",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "claimId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/{userId}/retrieve-data": {
+      "get": {
+        "operationId": "claims-16",
+        "security": [],
+        "tags": [
+          "claims"
+        ],
+        "summary": "User Id retrieve all claims",
+        "description": "User Id retrieve all claims. Claims encoded by user publicKey.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User id",
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "List claims encoded by user publicKey",
+                  "items": {
+                    "type": "string",
+                    "description": "claim encoded by user publicKey",
+                    "example": "60b03f85264f804a6f532e82d1dc97c8925d87c61a52563c90f0c2a612f32425a045a6f118956cafaf48deb8dfb8a7790207e01e412acf58a4906089a18bbee4b7f0513a10df4d86e4ec24a90932346582de5d80dd7f360b23dc0d6279fb440515f4f1ba1977d939707fa24b1c897cd2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/request/{issuerId}": {
+      "post": {
+        "operationId": "claims-3",
+        "security": [],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Request create claim",
+        "description": "Holder request Issuer issue a Claim",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Holder's data",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestClaim"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Response create Claim",
+                  "type": "object",
+                  "properties": {
+                    "claimId": {
+                      "type": "string",
+                      "description": "Id of claim",
+                      "example": "id1234"
+                    },
+                    "rawData": {
+                      "type": "object",
+                      "description": "Data of user",
+                      "example": {
+                        "dateOfBirth": 20000101,
+                        "address": "abc"
+                      }
+                    },
+                    "claim": {
+                      "type": "array",
+                      "description": "claim entry",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": ["0", "0", "0", "0", "0", "0", "0", "0"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/issue/{issuerId}": {
+      "post": {
+        "operationId": "claims-4",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Issue list claim",
+        "description": "Issuer issue array claims for holders",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "12324"
+          }
+        ],
+        "requestBody": {
+          "description": "Array data of holders",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueListClaims"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/{claimId}/status": {
+      "get": {
+        "operationId": "claims-5",
+        "security": [],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Get claim status",
+        "description": "Check status of a claim",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "Id of claim",
+            "schema": {
+              "type": "string",
+              "example": "id123"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Status of claim",
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "PENDING", "ACTIVE", "REVIEWING", "REJECT", "PENDING_REVOKE", "REVOKED"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/{issuerId}/{claimId}/status/{status}": {
+      "put": {
+        "operationId": "claims-14",
+        "tags": [
+          "claims"
+        ],
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "summary": "Update Reviewing Claim",
+        "description": "Update Reviewing claim to Pending",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer",
+            "schema": {
+              "type": "string",
+              "example": "id123"
+            },
+            "required": true
+          },
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "Id of claim",
+            "schema": {
+              "type": "string",
+              "example": "id123"
+            },
+            "required": true
+          },
+          {
+            "name": "status",
+            "in": "path",
+            "description": "Claim Status, must be PENDING or REJECT",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING", "REJECT"
+              ],
+              "default": "PENDING"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "claimId": {
+                      "type": "string",
+                      "description": "Id of claim",
+                      "example": "id1234"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Claim status",
+                      "enum": [
+                        "PENDING", "ACTIVE", "REVIEWING", "REJECT", "PENDING_REVOKE", "REVOKED"
+                      ],
+                      "default": "PENDING"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/{claimId}/proof": {
+      "get": {
+        "operationId": "claims-6",
+        "security": [],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Query proof input",
+        "description": "Query proof input for generate witness of claims",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "id of claim",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "type in (mtp, nonRevMtp)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "mtp",
+              "enum": [
+                "mtp",
+                "nonRevMtp"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/revoke-list/{issuerId}": {
+      "post": {
+        "operationId": "claims-7",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Revoke list claims",
+        "description": "Issuer revoke list claims",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "List claimId revoke",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/publish-challenge/{issuerId}": {
+      "get": {
+        "operationId": "claims-8",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Get publish challenge",
+        "description": "Issuer get Publish Challange to Publish ***ALL PENDING CLAIM***",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Challenge to Publish Claim",
+                  "$ref": "#/components/schemas/Challenge"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/revoke-challenge/{issuerId}": {
+      "get": {
+        "operationId": "claims-9",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Get challenge to Revoke Claim",
+        "description": "Issuer get Challenge to Revoke ***ALL PENDING_REVOKE CLAIM***",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Challenge revoke claim",
+                  "$ref": "#/components/schemas/Challenge"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/combined-challenge/{issuerId}": {
+      "get": {
+        "operationId": "claims-10",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Get challenge to publish and revoke claim",
+        "description": "Get challenge to publish PENDING claim and revoke PENDING_REVOKE claim",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Challenge"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/publish/{issuerId}": {
+      "post": {
+        "operationId": "claims-11",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Publish claims",
+        "description": "Issuer Publish ***ALL PENDING CLAIMS***. Then update new State of Issuer Tree to block chain",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Signature"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/revoke/{issuerId}": {
+      "post": {
+        "operationId": "claims-12",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Revoke claims",
+        "description": "Revoke all PENDING_REVOKE claims. Then update new State of Issuer Tree to block chain",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Signature"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/claims/combined/{issuerId}": {
+      "post": {
+        "operationId": "claims-13",
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Publish and revoke claims",
+        "description": "Publish all PENDING claims and Revoke all PENDING_REVOKE claims. Then update new State of Issuer Tree to block chain",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of issuer",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Signature"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/schemas": {
+      "post": {
+        "operationId": "schemas-1",
+        "security": [],
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Request Create Schema",
+        "description": "Request create a schema.",
+        "requestBody": {
+          "description": "Your schema",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Schema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "schemas-2",
+        "security": [],
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Get all schema",
+        "description": "Find all schema",
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Find all Schema",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SchemaResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/schemas/{schemaHash}": {
+      "get": {
+        "operationId": "schemas-3",
+        "security": [],
+        "tags": [
+          "schemas"
+        ],
+        "parameters": [
+          {
+            "name": "schemaHash",
+            "in": "path",
+            "description": "find schema by schemaHash",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "12345"
+            }
+          }
+        ],
+        "summary": "Find schema",
+        "description": "Find schema by schemaHash",
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Schema find by schemaHash",
+                  "$ref": "#/components/schemas/SchemaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/schemas/primative/{schemaHash}": {
+      "get": {
+        "operationId": "schemas-4",
+        "security": [],
+        "tags": [
+          "schemas"
+        ],
+        "parameters": [
+          {
+            "name": "schemaHash",
+            "in": "path",
+            "description": "schemaHash",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "summary": "Get Input Form Schema",
+        "description": "API Get input form schema by SchemaHash. Type of fieldData will be Standard Type.",
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "@id": {
+                      "type": "string",
+                      "description": "id of schema"
+                    },
+                    "@hash": {
+                      "type": "string",
+                      "description": "schema hash"
+                    },
+                    "@name": {
+                      "type": "string",
+                      "description": "Schema name"
+                    },
+                    "@type": {
+                      "type": "string",
+                      "description": "Schema type",
+                      "enum": [
+                        "schema",
+                        "context"
+                      ],
+                      "default": "schema"
+                    },
+                    "@required": {
+                      "type": "array",
+                      "description": "Attribute required in schema",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "fieldName": {
+                      "type": "object",
+                      "properties": {
+                        "@id": {
+                          "type": "string",
+                          "description": "Slot in claim to save this data",
+                          "enum": [
+                            "std-pos:idx-1", "std-pos:idx-2", "std-pos:idx-1", "std-pos:val-1", "std-pos:val-2"
+                          ]
+                        },
+                        "@type": {
+                          "type": "string",
+                          "description": "Standard data type",
+                          "enum": [
+                            "std:str", "std:int32", "std:double", "std:obj", "std:bool", "std:date"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "@id": "basic-course",
+                    "@hash": "123456",
+                    "@name": "Basic course certificate",
+                    "@type": "schema",
+                    "certificate-id": {
+                      "@id": "std-pos:idx-1",
+                      "@type": "std:str"
+                    },
+                    "name": {
+                      "@id": "std-pos:val-1",
+                      "@type": "std:str"
+                    },
+                    "result": {
+                      "@id": "std-pos:val-1",
+                      "@type": "std:str"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/registries": {
+      "post": {
+        "operationId": "registries-1",
+        "security": [],
+        "tags": [
+          "registries"
+        ],
+        "summary": "Create new Registry",
+        "description": "Create new registry services for issuer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Registry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRegistryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "registries-2",
+        "security": [],
+        "tags": [
+          "registries"
+        ],
+        "summary": "Find Registry Service",
+        "description": "Find Registry Service by SchemaHash, IssuerId or NetworkId",
+        "parameters": [
+          {
+            "name": "schemaHash",
+            "in": "query",
+            "description": "hash of schema",
+            "schema": {
+              "type": "string",
+              "example": "123456789"
+            }
+          },
+          {
+            "name": "issuerId",
+            "in": "query",
+            "description": "DID of Issuer",
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          },
+          {
+            "name": "networkId",
+            "in": "query",
+            "description": "Id of network",
+            "schema": {
+              "type": "integer",
+              "example": 97
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Array registry",
+                  "items": {
+                    "$ref": "#/components/schemas/QueryRegistryResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/registries/{registryId}": {
+      "put": {
+        "operationId": "registries-3",
+        "security": [],
+        "tags": [
+          "registries"
+        ],
+        "summary": "Update Registry",
+        "description": "Update Registry Service",
+        "parameters": [
+          {
+            "name": "registryId",
+            "in": "path",
+            "description": "Id of Registry service",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "id1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Registry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Registry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "registries-6",
+        "security": [],
+        "tags": [
+          "registries"
+        ],
+        "summary": "Get Registry services by registryId",
+        "description": "Get registry services by registryId",
+        "parameters": [
+          {
+            "name": "registryId",
+            "in": "path",
+            "description": "Id of Registry service",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "id1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Registry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/registries/{registryId}/activate": {
+      "put": {
+        "operationId": "registries-4",
+        "security": [],
+        "tags": [
+          "registries"
+        ],
+        "summary": "Active/Deactive registry",
+        "description": "Change status of registry",
+        "parameters": [
+          {
+            "name": "registryId",
+            "in": "path",
+            "description": "Id of registry service",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "isActive": {
+                    "type": "boolean",
+                    "description": "Status of Registry Service",
+                    "example": true
+                  }
+                },
+                "required": ["isActive"]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Registry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/registries/requirements": {
+      "post": {
+        "operationId": "registries-5",
+        "security": [],
+        "tags": [
+          "registries"
+        ],
+        "summary": "Attest requirement of registry",
+        "description": "Attest requirement of registry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "registryId": {
+                    "type": "string",
+                    "description": "Id of registry services",
+                    "example": "id123"
+                  },
+                  "zkProofs": {
+                    "type": "array",
+                    "description": "List of ZKPs for attest requirements",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "proof": {
+                          "type": "object",
+                          "description": "Your ZK Proof"
+                        },
+                        "publicData": {
+                          "type": "array",
+                          "description": "Your Public Signals",
+                          "items": {
+                            "type": "string",
+                            "description": "Your Public Signals"
+                          }
+                        }
+                      },
+                      "required": [
+                        "proof", "publicData"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Result attest requirement",
+                  "properties": {
+                    "isValid": {
+                      "type": "boolean",
+                      "description": "Return true if attest true, else return false",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/networks": {
+      "post": {
+        "operationId": "networks-1",
+        "security": [],
+        "tags": [
+          "networks"
+        ],
+        "summary": "Create new network",
+        "description": "Create new support network",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NetworkResponse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "networks-2",
+        "security": [],
+        "tags": [
+          "networks"
+        ],
+        "summary": "Get all network",
+        "description": "Get all support network",
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Array of Network information",
+                  "items": {
+                    "$ref": "#/components/schemas/NetworkResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/networks/{networkId}": {
+      "get": {
+        "operationId": "networks-3",
+        "security": [],
+        "tags": [
+          "networks"
+        ],
+        "summary": "Get Network information",
+        "description": "Get a Network information by NetworkId",
+        "parameters": [
+          {
+            "name": "networkId",
+            "in": "path",
+            "description": "Id of network",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 97
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "networks-4",
+        "security": [],
+        "tags": [
+          "networks"
+        ],
+        "summary": "Update network",
+        "description": "Update network information by networkId",
+        "parameters": [
+          {
+            "name": "networkId",
+            "in": "path",
+            "description": "id of network",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 97
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Network"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "networks-5",
+        "security": [],
+        "tags": [
+          "networks"
+        ],
+        "summary": "Delete Network",
+        "description": "Delete network by networkId",
+        "parameters": [
+          {
+            "name": "networkId",
+            "in": "path",
+            "description": "id of network",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 97
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "APIResponse": {
+        "type": "object",
+        "properties": {
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "type error",
+            "example": "Invalid request"
+          },
+          "message": {
+            "type": "string",
+            "description": "error message",
+            "example": "Invalid request"
+          }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "proof": {
+            "type": "object",
+            "description": "Your proof"
+          },
+          "public_signals": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Your Public Signals"
+            }
+          },
+          "circuitId": {
+            "type": "string",
+            "description": "CircuitId"
+          },
+          "schema": {
+            "type": "string",
+            "description": "Schema Hash of Authen (123456)"
+          },
+          "algorithm": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "string"
+          }
+        },
+        "required": ["proof", "public_signals", "circuitId", "schema", "algorithm", "payload"]
+      },
+      "VerifyToken": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Your JWZ token",
+            "example": "token123"
+          }
+        },
+        "required": ["token"]
+      },
+      "Holder": {
+        "type": "object",
+        "properties": {
+          "pubkeyX": {
+            "type": "string",
+            "description": "Your PublicKeyX",
+            "example": "1234"
+          },
+          "pubkeyY": {
+            "type": "string",
+            "description": "Your PublicKeyY",
+            "example": "1234"
+          }
+        },
+        "required": ["pubkeyX", "pubkeyY"]
+      },
+      "Operator": {
+        "description": "Information of operator",
+        "type": "object",
+        "properties": {
+          "operatorId": {
+            "type": "string",
+            "description": "DID of Operator",
+            "example": "1234"
+          }
+        },
+        "required": ["operatorId"]
+      },
+      "Signature": {
+        "type": "object", 
+        "properties": {
+          "signature": {
+            "description": "Your signature",
+            "type": "object",
+            "properties": {
+              "challenge": {
+                "type": "string",
+                "format": "BigNum",
+                "example": "2400161577681291238529280264703639496358080169515952608708589558013231430525"
+              },
+              "challengeSignatureR8x": {
+                "type": "string",
+                "format": "BigNum",
+                "example": "11890003505821740942342827466490219951374204720747371650777335503316016714756"
+              },
+              "challengeSignatureR8y": {
+                "type": "string",
+                "format": "BigNum",
+                "example": "4572047267382586032939239839765622365092726649604288788632301595003251991693"
+              },
+              "challengeSignatureS": {
+                "type": "string",
+                "format": "BigNum",
+                "example": "2655604807051308811171436613928479239441325277756998151249502848413329977634"
+              }
+            },
+            "required": ["challenge", "challengeSignatureR8x", "challengeSignatureR8y", "challengeSignatureS"]
+          }
+        },
+        "required": ["signature"]
+      },
+      "Network": {
+        "type": "object",
+        "properties": {
+          "networkId": {
+            "type": "integer",
+            "description": "Id of network supported",
+            "example": 97
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of Network",
+            "example": "Binance Smart Chain Testnet"
+          },
+          "shotName": {
+            "type": "string",
+            "description": "Shot name of Network",
+            "example": "bnbt"
+          }
+        },
+        "required": ["networkId", "name", "shotName"]
+      },
+      "NetworkResponse": {
+        "type": "object",
+        "properties": {
+          "networdId": {
+            "type": "integer",
+            "description": "Id of network supported",
+            "example": 97
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of Network",
+            "example": "Binance Smart Chain Testnet"
+          },
+          "shotName": {
+            "type": "string",
+            "description": "Shot name of Network",
+            "example": "bnbt"
+          },
+          "createAt": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Time stamp Create network",
+            "example": "1681355391"
+          },
+          "updateAt": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Time stamp Update network",
+            "example": "1681355391"
+          }
+        }
+      },
+      "Schema": {
+        "type": "object",
+        "properties": {
+          "@name": {
+            "type": "string",
+            "description": "Schema name"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Schema type",
+            "enum": [
+              "schema",
+              "context"
+            ],
+            "default": "schema"
+          },
+          "@context": {
+            "type": "array",
+            "description": "List context url use in this schema",
+            "items": {
+              "type": "string",
+              "format": "url",
+              "description": "Link context"
+            },
+            "example": ["example.schema.url"]          
+          },
+          "@required": {
+            "type": "array",
+            "description": "Attribute required in schema",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fieldName": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "type": "string",
+                "description": "Slot in claim to save this data",
+                "enum": [
+                  "std-pos:idx-1", "std-pos:idx-2", "std-pos:idx-1", "std-pos:val-1", "std-pos:val-2"
+                ],
+                "example": "std-pos:idx-1"
+              },
+              "@type": {
+                "type": "string",
+                "description": "Type of data."
+              }
+            },
+            "required": ["@id", "@type"]
+          }
+        },
+        "required": ["@name", "@type", "@context", "@required"],
+        "example": {
+          "@name": "Basic course certificate",
+          "@type": "schema",
+          "@context": [],
+          "certificate-id": {
+            "@id": "std-pos:idx-1",
+		        "@type": "std:str"
+          },
+          "name": {
+            "@id": "std-pos:val-1",
+            "@type": "std:str"
+          },
+          "result": {
+            "@id": "std-pos:val-1",
+            "@type": "std:str"
+          }
+        }
+      },
+      "RevokeList": {
+        "type": "object",
+        "properties": {
+          "revNonces": {
+            "type": "array",
+            "description": "List claim revNonce",
+            "items": {
+              "type": "integer",
+              "description": "revNonce of claim",
+              "example": 2
+            }
+          }
+        },
+        "required": ["revNonces"]
+      },
+      "Registry": {
+        "type": "object",
+        "properties": {
+          "schemaHash": {
+            "type": "string",
+            "example": "schemaHash",
+            "description": "Hash of schema in registry"
+          },
+          "issuerId": {
+            "type": "string",
+            "example": "issuerId",
+            "description": "DID of Issuer"
+          },
+          "description": {
+            "type": "string",
+            "example": "description",
+            "description": "Description about this Registry"
+          },
+          "expiration": {
+            "type": "integer",
+            "format": "int64",
+            "example": 0,
+            "description": "Expiration data of claims created by this registry"
+          },
+          "updatetable": {
+            "type": "boolean",
+            "example": false,
+            "description": "Updatetable of claim"
+          },
+          "networkId": {
+            "type": "integer",
+            "example": 97,
+            "description": "Support network"
+          },
+          "endpointUrl": {
+            "type": "string",
+            "example": "endpointUrl",
+            "description": "url of issuer service registry"
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "title of requiement",
+                  "example": "title"
+                },
+                "attestation": {
+                  "type": "string",
+                  "description": "attestation",
+                  "example": "attestation"
+                },
+                "allowedIssuers": {
+                  "type": "array",
+                  "description": "list of issuer id",
+                  "items": {
+                    "type": "string",
+                    "description": "DID of issuer",
+                    "example": "12345"
+                  }
+                },
+                "schemaHash": {
+                  "type": "string",
+                  "description": "schema hash of claim"
+                },
+                "query": {
+                  "type": "object",
+                  "properties": {
+                    "propertyName": {
+                      "type": "string",
+                      "example": "dateOfBirth",
+                      "description": "Name of property need to query"
+                    },
+                    "operator": {
+                      "type": "integer",
+                      "example": 2,
+                      "description": "Operator compare"
+                    },
+                    "value": {
+                      "type": "array",
+                      "description": "Array of values compare",
+                      "items": {
+                        "type": "integer",
+                        "example": 20010101
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": ["schemaHash", "issuerId", "description", "networkId", "endpointUrl"]
+      },
+      "RequestClaim": {
+        "description": "Body for request new Claim",
+        "type": "object",
+        "properties": {
+          "holderId": {
+            "type": "string",
+            "description": "DID of Holder who request new claim",
+            "example": "1234"
+          },
+          "registryId": {
+            "type": "string",
+            "description": "Id of registry what holder want to create claim",
+            "example": "id123"
+          },
+          "data": {
+            "description": "Holder's data to create claim",
+            "type": "object",
+            "example": {
+              "name": "name",
+              "age": 20
+            }
+          },
+          "zkProofs": {
+            "type": "array",
+            "description": "List of ZKPs for attest requirements",
+            "items": {
+              "type": "object",
+              "properties": {
+                "proof": {
+                  "type": "object",
+                  "description": "Your ZK Proof"
+                },
+                "publicData": {
+                  "type": "array",
+                  "description": "Your Public Signals",
+                  "items": {
+                    "type": "string",
+                    "description": "Your Public Signals"
+                  }
+                }
+              },
+              "required": [
+                "proof", "publicData"
+              ]
+            }
+          },
+          "fileUpload": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            }
+          }
+        },
+        "required": ["holderId", "registryId", "data"]
+      },
+      "IssueListClaims": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "holderId": {
+              "type": "string",
+              "description": "DID of Holder who request new claim",
+              "example": "1234"
+            },
+            "registryId": {
+              "type": "string",
+              "description": "Id of registry what holder want to create claim",
+              "example": "id123"
+            },
+            "data": {
+              "description": "Holder's data to create claim",
+              "type": "object",
+              "example": {
+                "name": "name",
+                "age": 20
+              }
+            }
+          },
+          "required": ["holderId", "registryId", "data"]
+        }
+      },
+      "Challenge": {
+        "type": "object",
+        "properties": {
+          "challenge": {
+            "type": "string",
+            "format": "BigNum",
+            "description": "Challenge to sign message",
+            "example": "123456"
+          }
+        }
+      },
+      "SchemaResponse": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "id of schema"
+          },
+          "@hash": {
+            "type": "string",
+            "description": "schema hash"
+          },
+          "@name": {
+            "type": "string",
+            "description": "Schema name"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Schema type",
+            "enum": [
+              "schema",
+              "context"
+            ],
+            "default": "schema"
+          },
+          "@context": {
+            "type": "array",
+            "description": "List context url use in this schema",
+            "items": {
+              "type": "string",
+              "format": "url",
+              "description": "Link context"
+            },
+            "example": ["example.context.url"]          
+          },
+          "@required": {
+            "type": "array",
+            "description": "Attribute required in schema",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fieldName": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "type": "string",
+                "description": "Slot in claim to save this data",
+                "enum": [
+                  "std-pos:idx-1", "std-pos:idx-2", "std-pos:idx-1", "std-pos:val-1", "std-pos:val-2"
+                ],
+                "example": "std-pos:idx-1"
+              },
+              "@type": {
+                "type": "string",
+                "description": "Type of data."
+              }
+            }
+          }
+        },
+        "example": {
+          "@id": "basic-course",
+          "@hash": "123456",
+          "@name": "Basic course certificate",
+          "@type": "schema",
+          "@context": [],
+          "certificate-id": {
+            "@id": "std-pos:idx-1",
+            "@type": "std:str"
+          },
+          "name": {
+            "@id": "std-pos:val-1",
+            "@type": "std:str"
+          },
+          "result": {
+            "@id": "std-pos:val-1",
+            "@type": "std:str"
+          }
+        }
+      },
+      "ServiceRegistryResponse": {
+        "description": "Registry Response",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of registry",
+            "example": "id1234"
+          },
+          "schema": {
+            "type": "object",
+            "description": "Schema information",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "name of schema",
+                "example": "schemaName"
+              },
+              "hash": {
+                "type": "string",
+                "description": "hash of schema",
+                "example": "123456789"
+              }
+            }
+          },
+          "issuerId": {
+            "type": "string",
+            "description": "DID of Issuer",
+            "example": "1234"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description about this Registry",
+            "example": "description"
+          },
+          "expiration": {
+            "type": "integer",
+            "format": "int64",
+            "example": 0,
+            "description": "Expiration data of claims created by this registry"
+          },
+          "updatetable": {
+            "type": "boolean",
+            "example": false,
+            "description": "Updatetable of claim"
+          },
+          "endpointUrl": {
+            "type": "string",
+            "example": "endpointUrl",
+            "description": "url of issuer service registry"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Status of Registry Service"
+          },
+          "network": {
+            "type": "object",
+            "description": "network information",
+            "properties": {
+              "networdId": {
+                "type": "integer",
+                "description": "Id of network",
+                "example": 97
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of network",
+                "example": "bnb testnet"
+              }
+            }
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "title of requiement",
+                  "example": "title"
+                },
+                "attestation": {
+                  "type": "string",
+                  "description": "attestation",
+                  "example": "attestation"
+                },
+                "allowedIssuers": {
+                  "type": "array",
+                  "description": "list of issuer id",
+                  "items": {
+                    "type": "string",
+                    "description": "DID of issuer",
+                    "example": "12345"
+                  }
+                },
+                "schemaHash": {
+                  "type": "string",
+                  "description": "schema hash of claim"
+                },
+                "query": {
+                  "type": "object",
+                  "properties": {
+                    "propertyName": {
+                      "type": "string",
+                      "example": "dateOfBirth",
+                      "description": "Name of property need to query"
+                    },
+                    "operator": {
+                      "type": "integer",
+                      "example": 2,
+                      "description": "Operator compare"
+                    },
+                    "value": {
+                      "type": "array",
+                      "description": "Array of values compare",
+                      "items": {
+                        "type": "integer",
+                        "example": 20010101
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "QueryRegistryResponse": {
+        "description": "Registry Response",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of registry",
+            "example": "id1234"
+          },
+          "schema": {
+            "type": "object",
+            "description": "Schema information",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "name of schema",
+                "example": "schemaName"
+              },
+              "hash": {
+                "type": "string",
+                "description": "hash of schema",
+                "example": "123456789"
+              }
+            }
+          },
+          "issuerId": {
+            "type": "string",
+            "description": "DID of Issuer",
+            "example": "1234"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description about this Registry",
+            "example": "description"
+          },
+          "expiration": {
+            "type": "integer",
+            "format": "int64",
+            "example": 0,
+            "description": "Expiration data of claims created by this registry"
+          },
+          "updatetable": {
+            "type": "boolean",
+            "example": false,
+            "description": "Updatetable of claim"
+          },
+          "endpointUrl": {
+            "type": "string",
+            "example": "endpointUrl",
+            "description": "url of issuer service registry"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Status of Registry Service"
+          },
+          "network": {
+            "type": "object",
+            "description": "network information",
+            "properties": {
+              "networdId": {
+                "type": "integer",
+                "description": "Id of network",
+                "example": 97
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of network",
+                "example": "bnb testnet"
+              }
+            }
+          },
+          "numClaims": {
+            "type": "integer",
+            "description": "Number claims are created by this registry",
+            "example": 100
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Authorization": {
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey",
+        "description": "Your JWZ Token"
+      }
+    }
+  }
+}

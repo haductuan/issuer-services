@@ -182,10 +182,12 @@ export class ClaimsController {
             const claimId = await saveClaim(claim, schemaHash, holderId, issuerId, registryId, ClaimStatus.REVIEWING);
             
             let imagesUrl = [];
-            const file = (req.files as UploadedFile)['fileUpload'];
-            if (file != undefined) {
-                for (let i = 0; i < file.length; i++) {
-                    imagesUrl.push(file[i].filename);
+            if (req.files != null) {
+                const file = (req.files as UploadedFile)['fileUpload'];
+                if (file != undefined) {
+                    for (let i = 0; i < file.length; i++) {
+                        imagesUrl.push(file[i].filename);
+                    }
                 }
             }
 

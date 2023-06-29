@@ -290,7 +290,9 @@ export async function holderGetAllClaim(userId: string) {
                 const data = {
                     claimId: entry.claimId,
                     rawData: entry.rawData,
-                    claim: entry.entry
+                    claim: entry.entry,
+                    issuerId: listClaim[i].issuerId,
+                    schemaHash: listClaim[i].schemaHash
                 };
                 const dataEncode = libsodium.crypto_box_seal(JSON.stringify(data), libsodium.from_hex(publicKey), "hex");
                 response.push(dataEncode);

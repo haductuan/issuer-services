@@ -34,7 +34,7 @@ export async function registerDIDToContract(userId: string, pubkeyX: string, pub
         const userPubkeyX = BigInt(pubkeyX);
         const userPubkeyY = BigInt(pubkeyY);
 
-        const registerDID = await didRegistry.connect(wallet).functions.registerDID(userDID, userPubkeyX, userPubkeyY, userPublicKey);
+        const registerDID = await didRegistry.connect(wallet).functions.registerDID(userDID, userPubkeyX, userPubkeyY, userPublicKey, { gasPrice: 15000000000 });
         const tx = await registerDID.wait();
         console.log(tx.events[0].event == "DIDRegister");
         if (tx.events[0].event == "DIDRegister") {

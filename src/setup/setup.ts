@@ -8,7 +8,7 @@ import { createNewSchema } from "../services/Schema.js";
 import { createNewRegistry } from "../services/RegistryService.js";
 import SchemaRegistry from "../models/SchemaRegistry.js";
 import libsodium from "libsodium-wrappers";
-import { registerDIDToContract } from "../services/KYCRegistry.js";
+import { registerDIDToContract, resolveDID } from "../services/KYCRegistry.js";
 import { getSchemaHashFromSchema } from "../util/utils.js";
 import Schema from "../models/Schema.js";
 
@@ -29,9 +29,11 @@ export async function setupKYCIssuer() {
             while(privateKey.length < 64) {
                 privateKey = "0" + privateKey;
             }
-            const publicKey = libsodium.crypto_scalarmult_base(libsodium.from_hex(privateKey), "hex");
-            await registerDIDToContract(GlobalVariables.KYCIssuer, pubkeyX, pubkeyY, publicKey);
-
+            const resolve = await resolveDID(GlobalVariables.KYCIssuer);
+            if (resolve.publicKey == "0") {
+                const publicKey = libsodium.crypto_scalarmult_base(libsodium.from_hex(privateKey), "hex");
+                await registerDIDToContract(GlobalVariables.KYCIssuer, pubkeyX, pubkeyY, publicKey);    
+            }
         } else {
             GlobalVariables.KYCIssuer = issuer.issuerId!;
         }

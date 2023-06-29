@@ -174,7 +174,7 @@ export async function stateTransition(issuerId: string, signature: SignedChallen
         const stateABI = JSON.parse(fs.readFileSync("src/abis/State.json", "utf-8"))
         const state = new ethers.Contract(STATE_ADDRESS, stateABI, provider);
 
-        const transitState = await state.connect(wallet).functions.transitState(publicSig[0], publicSig[1], publicSig[2], publicSig[3], a, b, c, { gasLimit: 3000000 });
+        const transitState = await state.connect(wallet).functions.transitState(publicSig[0], publicSig[1], publicSig[2], publicSig[3], a, b, c, { gasPrice: 15000000000 });
         const tx = await transitState.wait();
         console.log(tx.events[0].event == "StateUpdated");
         try {

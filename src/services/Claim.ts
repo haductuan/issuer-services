@@ -289,7 +289,7 @@ export async function holderGetAllClaim(userId: string) {
                 // encode claim
                 const data = {
                     claimId: entry.claimId,
-                    rawData: entry.rawData,
+                    rawData: JSON.parse(entry.rawData ?? ""),
                     claim: entry.entry,
                     issuerId: listClaim[i].issuerId,
                     schemaHash: listClaim[i].schemaHash

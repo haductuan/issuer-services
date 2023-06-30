@@ -59,8 +59,10 @@ export async function resolveDID(userId: string) {
         const id = BigInt(did.id.toString()).toString(16);
         const pubkeyX = BigInt(did.pubkeyX.toString()).toString();
         const pubkeyY = BigInt(did.pubkeyY.toString()).toString();
-        const publicKey = BigInt(did.publicKey.toString()).toString(16);
-        
+        let publicKey = BigInt(did.publicKey.toString()).toString(16);
+        while(publicKey.length < 64) {
+            publicKey = '0' + publicKey;
+        }
         return {
             userId: id, 
             pubkeyX: pubkeyX, 

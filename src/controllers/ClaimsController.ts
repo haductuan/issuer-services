@@ -136,7 +136,6 @@ export class ClaimsController {
             const requirement = await getRegistryRequirement(registryId);
             if ( requirement.length != 0 ) {
                 let { zkProofs } = req.body;
-                console.log("---proof---\n", zkProofs, "\n----end----");
                 if (!zkProofs) {
                     throw("Need ZKPs to attest requirement!");
                 }
@@ -157,7 +156,6 @@ export class ClaimsController {
                         }
                     }
                 }
-                console.log("--after json --\n", zkProofs, "\n---end----")
                 const attestResult = await checkProof(zkProofs, registryId);
                 if (!attestResult) {
                     throw("Attest requirement failed!");

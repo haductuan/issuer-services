@@ -167,6 +167,10 @@ export async function updateRegistry(registryId: string, schemaHash: string, iss
         throw("networkId not exist!");
     }
 
+    if (expiration == 0) {
+        expiration = 10*365*24*60*60*60*1000;
+    }
+    
     registry.schemaHash = schemaHash;
     registry.issuerId = issuerId;
     registry.description = description;

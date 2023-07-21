@@ -136,12 +136,14 @@ export class ClaimsController {
             const requirement = await getRegistryRequirement(registryId);
             if ( requirement.length != 0 ) {
                 let { zkProofs } = req.body;
+                console.log("---proof---\n", zkProofs, "\n----end----");
                 if (!zkProofs) {
                     throw("Need ZKPs to attest requirement!");
                 }
                 
                 if (!Array.isArray(zkProofs) && typeof zkProofs == 'string') {
-                    zkProofs = '[' + zkProofs + ']';
+                    if (zkProofs[0] != '[')
+                        zkProofs = '[' + zkProofs + ']';
                 }
                 
                 if (typeof zkProofs == 'string') {
@@ -155,6 +157,7 @@ export class ClaimsController {
                         }
                     }
                 }
+                console.log("--after json --\n", zkProofs, "\n---end----")
                 const attestResult = await checkProof(zkProofs, registryId);
                 if (!attestResult) {
                     throw("Attest requirement failed!");

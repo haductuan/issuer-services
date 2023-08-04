@@ -241,6 +241,17 @@
           "issuers"
         ],
         "summary": "Get all issuers infor",
+        "parameters": [
+          {
+            "name": "operatorId",
+            "in": "query",
+            "description": "Your operatorId",
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
         "description": "API to get all issuers is registed in this server.",
         "responses": {
           "200": {

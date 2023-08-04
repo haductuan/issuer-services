@@ -36,7 +36,7 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
     }
 
     if (!expiration) {
-        expiration = 0;
+        expiration = 10*365*24*60*60*60*1000;
     }
 
     const schema = await Schema.findOne({"@hash": schemaHash});

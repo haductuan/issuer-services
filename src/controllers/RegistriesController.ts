@@ -10,7 +10,7 @@ export class RegistriesController {
     public async registerNewSchemaRegistry(req: Request, res: Response) {
         try {
             let {schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl, requirements, schema} = req.body;
-
+            console.log(req.body);
             if ((schemaHash == undefined || schemaHash == '') && schema != undefined) {
                 const createSchema = await createNewSchema(schema);
                 schemaHash = createSchema["@hash"];
@@ -65,6 +65,7 @@ export class RegistriesController {
                 throw("Invalid registryId");
             }
             const {schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl} = req.body;
+            console.log(expiration);
             if (schemaHash == undefined || issuerId == undefined 
                 || description == undefined || expiration == undefined 
                 || updatable == undefined || !endpointUrl == undefined || networkId == undefined

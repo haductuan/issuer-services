@@ -1,34 +1,44 @@
 {
-    "@name": "Vietnam Identity",
+    "@name": "Vietname Identity",
     "@type": "schema",
-    "@context": [],
-    "idType": {
+    "@context": [
+        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/contexts/us-document-id.json",
+        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/contexts/country-code-iso-3166.json"
+    ],
+    "id-card": {
         "@id": "std-pos:idx-1",
         "@type": "std:str"
     },
-    "documentId": {
-        "@id": "std-pos:idx-1",
-        "@type": "std:str"
-    },
-    "name": {
-        "@id": "std-pos:idx-2",
-        "@type": "std:str"
-    },
-    "dob": {
-        "@id": "std-pos:idx-2",
-        "@type": "std:date"
-    },
-    "sex": {
+    "full-name": {
         "@id": "std-pos:val-1",
         "@type": "std:str"
+    },
+    "date-of-birth": {
+        "@id": "std-pos:val-1",
+        "@type": "std:date"
+    },
+    "gender": {
+        "@id": "std-pos:idx-2",
+        "@type": "usdi:gender"
     },
     "nationality": {
         "@id": "std-pos:val-1",
-        "@type": "std:str"
+        "@type": "cc3166:numeric-code"
     },
-    "addresses": {
+    "place-of-origin": {
         "@id": "std-pos:val-2",
         "@type": "std:str"
     },
-    "@required": []
+    "place-of-residence": {
+        "@id": "std-pos:val-2",
+        "@type": "std:str"
+    },
+    "@required": [
+        "id-card",
+        "full-name",
+        "date-of-birth",
+        "nationality",
+        "place-of-origin",
+        "place-of-residence"
+    ]
 }

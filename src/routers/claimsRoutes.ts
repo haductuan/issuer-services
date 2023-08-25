@@ -29,6 +29,6 @@ export class ClaimsRouters {
         this.router.post("/combined/:issuerId", this.authenController.authorizationAdmin, this.claimsController.publishAndRevokeClaims);
         this.router.put("/:issuerId/:claimId/status/:status", this.authenController.authorization, this.claimsController.updateReviewingClaim);
         this.router.get("/:issuerId/raw-data", this.authenController.authorizationAdmin, this.claimsController.getRawClaim);
-        this.router.get("/:userId/retrieve-data", this.claimsController.holderRetriveAllClaim);
+        this.router.get("/:userId/retrieve-data", this.claimsController.holderRetrieveAllClaim);
     }
 }

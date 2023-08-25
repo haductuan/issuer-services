@@ -8,9 +8,9 @@ export class SchemasController {
     public async createNewSchema(req: Request, res: Response) {
         try {
             const schema = req.body;
-            
+
             const response = await createNewSchema(schema);
-            
+
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message));
 
         } catch (err: any) {
@@ -31,9 +31,9 @@ export class SchemasController {
 
     public async getSchemaBySchemaHash(req: Request, res: Response) {
         try {
-            const {schemaHash} = req.params;
+            const { schemaHash } = req.params;
             if (!schemaHash || typeof schemaHash != "string") {
-                throw("Invalid schemaHash");
+                throw ("Invalid schemaHash");
             }
 
             // const schema = await getSchemaBySchemaHash(schemaHash);
@@ -48,9 +48,9 @@ export class SchemasController {
 
     public async getPrimativeSchemaBySchemaHash(req: Request, res: Response) {
         try {
-            const {schemaHash} = req.params;
+            const { schemaHash } = req.params;
             if (!schemaHash || typeof schemaHash != "string") {
-                throw("Invalid schemaHash");
+                throw ("Invalid schemaHash");
             }
 
             // const schema = await getSchemaBySchemaHash(schemaHash);

@@ -34,10 +34,10 @@ export class UploadMiddleWare {
                     cb: FilenameCallback
                 ): void => {
                     const portal = file.fieldname.slice(0, -4);
-                    cb(null, portal+'-'+uuid()+path.extname(file.originalname));
+                    cb(null, portal + '-' + uuid() + path.extname(file.originalname));
                 }
             });
-        
+
             const fileFilter = (
                 req: Request,
                 file: Express.Multer.File,
@@ -49,14 +49,14 @@ export class UploadMiddleWare {
                 const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
                 // Check mime
                 const mimetype = filetypes.test(file.mimetype);
-    
+
                 if (!(mimetype && extname)) cb(new Error('Invalid upload file type'));
-    
+
                 // Allowed size
                 const limit = IMAGE_MAX_SIZE;
                 // Check size
                 if (file.size > limit) cb(new Error('Upload file size too big'));
-    
+
                 cb(null, true);
             }
             return multer({ storage: fileStorage, fileFilter: fileFilter }).fields([

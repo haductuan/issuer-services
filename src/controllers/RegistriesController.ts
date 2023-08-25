@@ -2,14 +2,13 @@ import { Request, Response } from "express";
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
-import { UploadedFile } from "../middlewares/UploadMiddleware.js";
-import { changeStatusRegistry, checkProof, createNewRegistry, findSchemaRegistry, getRegistryById, getRegistryRequirement, updateRegistry } from "../services/RegistryService.js";
+import { changeStatusRegistry, checkProof, createNewRegistry, findSchemaRegistry, generateChallange as generateChallenge, getRegistryById, getRegistryRequirement, updateRegistry } from "../services/RegistryService.js";
 import { createNewSchema } from "../services/Schema.js";
 
 export class RegistriesController {
     public async registerNewSchemaRegistry(req: Request, res: Response) {
         try {
-            let {schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl, requirements, schema} = req.body;
+            let { schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl, requirements, schema } = req.body;
             console.log(req.body);
             if ((schemaHash == undefined || schemaHash == '') && schema != undefined) {
                 const createSchema = await createNewSchema(schema);
@@ -26,7 +25,7 @@ export class RegistriesController {
 
     public async findSchemaRegistry(req: Request, res: Response) {
         try {
-            let {schemaHash, issuerId, networkId} = req.query;
+            let { schemaHash, issuerId, networkId } = req.query;
             if (!schemaHash) {
                 schemaHash = "";
             }
@@ -38,15 +37,15 @@ export class RegistriesController {
             }
 
             if (typeof schemaHash != "string") {
-                throw("Invalid schemaHash");
+                throw ("Invalid schemaHash");
             }
 
             if (typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
-            
+
             if (typeof networkId != "string" && typeof networkId != "number") {
-                throw("Invalid networkId");
+                throw ("Invalid networkId");
             }
 
             const registries = await findSchemaRegistry(schemaHash, issuerId, Number(networkId));
@@ -60,22 +59,22 @@ export class RegistriesController {
 
     public async updateRegistrySchema(req: Request, res: Response) {
         try {
-            const {registryId} = req.params;
+            const { registryId } = req.params;
             if (!registryId || typeof registryId != "string") {
-                throw("Invalid registryId");
+                throw ("Invalid registryId");
             }
-            const {schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl} = req.body;
+            const { schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl } = req.body;
             console.log(expiration);
-            if (schemaHash == undefined || issuerId == undefined 
-                || description == undefined || expiration == undefined 
+            if (schemaHash == undefined || issuerId == undefined
+                || description == undefined || expiration == undefined
                 || updatable == undefined || !endpointUrl == undefined || networkId == undefined
                 || typeof networkId != "number") {
-                throw("Invalid input");
+                throw ("Invalid input");
             }
 
             const registry = await updateRegistry(registryId, schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registry, ResultMessage.APISUCCESS.message));
-        
+
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -84,14 +83,14 @@ export class RegistriesController {
 
     public async changeStatusSchemaRegistry(req: Request, res: Response) {
         try {
-            const {registryId} = req.params;
+            const { registryId } = req.params;
             if (!registryId || typeof registryId != "string") {
-                throw("Invalid registryId");
+                throw ("Invalid registryId");
             }
 
-            const {isActive} = req.body;
+            const { isActive } = req.body;
             if (typeof isActive != "boolean") {
-                throw("Invalid isActive")
+                throw ("Invalid isActive")
             }
 
             const registry = await changeStatusRegistry(registryId, isActive);
@@ -107,15 +106,30 @@ export class RegistriesController {
         try {
             const { registryId, zkProofs } = req.body;
             if (!registryId) {
-                throw("Invalid registryId");
+                throw ("Invalid registryId");
             }
             if (!Array.isArray(zkProofs)) {
-                throw("Invalid proof");
+                throw ("Invalid proof");
             }
 
             const isValidProof = await checkProof(zkProofs, registryId);
-            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, {isValid: isValidProof}, ResultMessage.APISUCCESS.message));
-            
+            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, { isValid: isValidProof }, ResultMessage.APISUCCESS.message));
+
+        } catch (err: any) {
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+        }
+    }
+
+    public async generateChallengeForProof(req: Request, res: Response) {
+        try {
+            const { registryId } = req.params;
+            if (!registryId || typeof registryId != "string") {
+                throw ("Invalid registry Id");
+            }
+
+            const challenge = await generateChallenge(registryId);
+            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, { challenge: challenge }, ResultMessage.APISUCCESS.message));
+
         } catch (err: any) {
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
@@ -125,7 +139,7 @@ export class RegistriesController {
         try {
             const { registryId } = req.params;
             if (!registryId) {
-                throw("Invalid registryId");
+                throw ("Invalid registryId");
             }
 
             const registry = await getRegistryById(registryId);

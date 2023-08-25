@@ -377,7 +377,6 @@ export async function getRawSchema(schemaHash: string) {
     const listContext = await getSubContext(schema);
 
     const keys = Object.keys(schemaRaw);
-    console.log(keys)
     keys.forEach(key => {
         if (key[0] ==  '_' || key[0] == '$' || key == "@context" || key == "@required") {
             return;

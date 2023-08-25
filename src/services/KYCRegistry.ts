@@ -7,9 +7,9 @@ import fs from "fs-extra"
 export async function getKYCRegistryInfor() {
     const issuerId = GlobalVariables.KYCIssuer;
     const registryId = GlobalVariables.KYCRegistry;
-    const registry = await SchemaRegistry.findOne({id: registryId});
+    const registry = await SchemaRegistry.findOne({ id: registryId });
     if (!registry) {
-        throw("KYC Registry not existed!");
+        throw ("KYC Registry not existed!");
     }
 
     const schemaHash = registry.schemaHash;
@@ -25,7 +25,7 @@ export async function registerDIDToContract(userId: string, pubkeyX: string, pub
     try {
         const provider = new ethers.providers.JsonRpcBatchProvider(RPC_PROVIDER);
         const secret = JSON.parse(fs.readFileSync("secret.json", "utf-8"))
-        const wallet = new ethers.Wallet(secret.pk, provider);    
+        const wallet = new ethers.Wallet(secret.pk, provider);
         const didRegistryABI = JSON.parse(fs.readFileSync("src/abis/Registry.json", "utf-8"));
         const didRegistry = new ethers.Contract(DID_REGISTRY_ADDRESS, didRegistryABI, provider);
 
@@ -60,22 +60,22 @@ export async function resolveDID(userId: string) {
         const pubkeyX = BigInt(did.pubkeyX.toString()).toString();
         const pubkeyY = BigInt(did.pubkeyY.toString()).toString();
         let publicKey = BigInt(did.publicKey.toString()).toString(16);
-        while(publicKey.length < 64) {
+        while (publicKey.length < 64) {
             publicKey = '0' + publicKey;
         }
         return {
-            userId: id, 
-            pubkeyX: pubkeyX, 
-            pubkeyY: pubkeyY, 
+            userId: id,
+            pubkeyX: pubkeyX,
+            pubkeyY: pubkeyY,
             publicKey: publicKey
         }
 
     } catch (err: any) {
         console.log(err);
         return {
-            userId: userId, 
-            pubkeyX: '0', 
-            pubkeyY: '0', 
+            userId: userId,
+            pubkeyX: '0',
+            pubkeyY: '0',
             publicKey: '0'
         }
     }

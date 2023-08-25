@@ -1,7 +1,7 @@
 import { dbPath, levelDbSrc, levelDbSrcClone, levelDbStateBackup } from "../common/config/constant.js";
 import fs from "fs-extra"
 
-import {db as zidenjsDb} from "@zidendev/zidenjs";
+import { db as zidenjsDb } from "@zidendev/zidenjs";
 import { GlobalVariables } from "../common/config/global.js";
 
 export async function createNewLevelDb(id: string) {
@@ -32,12 +32,7 @@ export async function createNewLevelDb(id: string) {
                 GlobalVariables.levelDb[pathLevelDb]["authsDb"] = authsDb;
             }
         }
-    
-        // const claimsDb = GlobalVariables.levelDb[pathLevelDb]["claimsDb"];
-        // const revocationDb = GlobalVariables.levelDb[pathLevelDb]["revocationDb"];
-        // const rootsDb = GlobalVariables.levelDb[pathLevelDb]["rootsDb"];
         
-        // return {pathLevelDb, claimsDb, revocationDb, rootsDb};
         return pathLevelDb;
     } catch (err: any) {
         throw (err);
@@ -52,7 +47,7 @@ export async function closeLevelDb(claimsDb: zidenjsDb.SMTLevelDb, claimRevDb: z
     } catch (err: any) {
         console.log(err);
     }
-    
+
 }
 
 export async function openLevelDb(src: string) {
@@ -87,7 +82,7 @@ export async function openLevelDb(src: string) {
     // const revocationDb = GlobalVariables.levelDb[src]["revocationDb"];
     // const rootsDb = GlobalVariables.levelDb[src]["rootsDb"];
     // return {claimsDb, revocationDb, rootsDb};
-    
+
 }
 
 export async function copyDb(src: string, des: string) {
@@ -95,7 +90,7 @@ export async function copyDb(src: string, des: string) {
         fs.removeSync(des);
         fs.copySync(src, des);
     } catch (err: any) {
-        throw(err);
+        throw (err);
     }
 }
 
@@ -122,17 +117,17 @@ export async function restoreLastStateTratition(path: string) {
 export async function close_db(src: string) {
     try {
         await GlobalVariables.levelDb[src].claimsDb.nodes.close();
-    } catch(err) {
+    } catch (err) {
         console.log(err)
     }
     try {
         await GlobalVariables.levelDb[src].claimRevDb.nodes.close();
-    } catch(err) {
+    } catch (err) {
         console.log(err)
     }
     try {
         await GlobalVariables.levelDb[src].authsDb.nodes.close();
-    } catch(err) {
+    } catch (err) {
         console.log(err)
     }
 }

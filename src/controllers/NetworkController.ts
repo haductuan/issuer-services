@@ -69,7 +69,7 @@ export class NetworkController {
             if (!networkId || typeof (networkId) != "number") {
                 throw ("invalid networkId");
             }
-            
+
             await removeNetwork(networkId);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
         } catch (err: any) {

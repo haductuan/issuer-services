@@ -20,4 +20,6 @@ export const AUTHEN_SERVER = process.env.AUTHEN_SERVER ?? "http://localhost:3001
 export const ISSUER_SERVER = process.env.ISSUER_SERVER?? "http://localhost:3000";
 
 export const MULTER_STORAGE_DEST = process.env.MULTER_STORAGE_DEST ?? './uploads';
-export const KYC_PRIVATE_KEY = process.env.KYC_PRIVATE_KEY ?? "123456789"
+export const KYC_PRIVATE_KEY = process.env.KYC_PRIVATE_KEY ?? "123456789";
+export const PROOF_VALID_TIME = Number(process.env.PROOF_VALID_TIME ?? "86400000");
+export const QUERY_MTP_VALIDATOR = process.env.QUERY_MTP_VALIDATOR ?? "0x0";

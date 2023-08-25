@@ -13,12 +13,11 @@ import Claim from "../models/Claim.js";
 import { checkProof, getRegistryRequirement } from "../services/RegistryService.js";
 import { verifyTokenAdmin } from "../services/Authen.js";
 import { UploadedFile } from "../middlewares/UploadMiddleware.js";
-import { ISSUER_SERVER } from "../common/config/secrets.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
         try {
-            let {issuerId, status, holderId, schemaHash, claimId} = req.query;
+            let { issuerId, status, holderId, schemaHash, claimId } = req.query;
             if (!issuerId) {
                 issuerId = "";
             }
@@ -42,7 +41,7 @@ export class ClaimsController {
             }
 
             if (typeof issuerId != "string" || typeof holderId != "string" || typeof schemaHash != "string") {
-                throw("Invalid query input");
+                throw ("Invalid query input");
             }
 
             const claims = await queryClaim(issuerId, status as string[], holderId, schemaHash, claimId as string[]);
@@ -60,23 +59,23 @@ export class ClaimsController {
             const id = req.params["claimId"];
             const type = req.query["type"];
             if (!id) {
-                throw("Invalid claimId!");
+                throw ("Invalid claimId!");
             }
 
             if (type != ProofTypeQuery.MTP && type != ProofTypeQuery.NON_REV_MTP) {
-                throw("Invalid type");
+                throw ("Invalid type");
             }
 
             const claim = await getClaimByClaimId(id);
-        
+
             if (claim.status != ClaimStatus.ACTIVE) {
-                throw("Claim is not ACTIVE");
+                throw ("Claim is not ACTIVE");
             }
 
             let queryResponse = {};
             const checkLock = await checkLockTreeState(claim.issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
 
             if (type == ProofTypeQuery.MTP) {
@@ -98,13 +97,13 @@ export class ClaimsController {
 
     public async getClaimStatus(req: Request, res: Response) {
         try {
-            const {claimId} = req.params;
+            const { claimId } = req.params;
             if (!claimId || typeof claimId != "string") {
-                throw("Invalid claimId");
+                throw ("Invalid claimId");
             }
             const claimStatus = await getClaimStatus(claimId);
             res.send(
-                buildResponse(ResultMessage.APISUCCESS.apiCode, {status: claimStatus}, ResultMessage.APISUCCESS.message)
+                buildResponse(ResultMessage.APISUCCESS.apiCode, { status: claimStatus }, ResultMessage.APISUCCESS.message)
             );
         } catch (err: any) {
             console.log(err);
@@ -114,9 +113,9 @@ export class ClaimsController {
 
     public async retrieveClaim(req: Request, res: Response) {
         try {
-            const {claimId} = req.params;
+            const { claimId } = req.params;
             if (!claimId || typeof claimId != "string") {
-                throw("Invalid claimId");
+                throw ("Invalid claimId");
             }
 
             const data = await getEntryData(claimId);
@@ -130,21 +129,21 @@ export class ClaimsController {
 
     public async requestNewClaim(req: Request, res: Response) {
         try {
-            let {holderId, registryId, data} = req.body;
-            const {issuerId} = req.params;
+            let { holderId, registryId, data } = req.body;
+            const { issuerId } = req.params;
 
             const requirement = await getRegistryRequirement(registryId);
-            if ( requirement.length != 0 ) {
+            if (requirement.length != 0) {
                 let { zkProofs } = req.body;
                 if (!zkProofs) {
-                    throw("Need ZKPs to attest requirement!");
+                    throw ("Need ZKPs to attest requirement!");
                 }
-                
+
                 if (!Array.isArray(zkProofs) && typeof zkProofs == 'string') {
                     if (zkProofs[0] != '[')
                         zkProofs = '[' + zkProofs + ']';
                 }
-                
+
                 if (typeof zkProofs == 'string') {
                     zkProofs = JSON.parse(zkProofs);
                 } else {
@@ -158,30 +157,30 @@ export class ClaimsController {
                 }
                 const attestResult = await checkProof(zkProofs, registryId);
                 if (!attestResult) {
-                    throw("Attest requirement failed!");
+                    throw ("Attest requirement failed!");
                 }
             }
 
             if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
             const checkLock = await checkLockTreeState(issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
-            
+
             if (!holderId || !registryId || !data
                 || typeof holderId != "string" || typeof registryId != "string") {
-                    throw("Invalid data");
+                throw ("Invalid data");
             }
-            
+
             if (typeof data == 'string') {
                 data = JSON.parse(data);
             }
 
-            const {claim, schemaHash} = await createClaim(data, holderId, registryId);
+            const { claim, schemaHash } = await createClaim(data, holderId, registryId);
             const claimId = await saveClaim(claim, schemaHash, holderId, issuerId, registryId, ClaimStatus.REVIEWING);
-            
+
             let imagesUrl = [];
             if (req.files != null) {
                 const file = (req.files as UploadedFile)['fileUpload'];
@@ -193,7 +192,7 @@ export class ClaimsController {
             }
 
             await saveEntryData(claimId, claim, data, imagesUrl);
-            
+
             res.send({ claimId: claimId, rawData: data, claim: serializaDataClaim(claim) });
         } catch (err: any) {
             console.log(err);
@@ -204,13 +203,13 @@ export class ClaimsController {
     public async issueListClaims(req: Request, res: Response) {
         try {
             let claimResponse: Array<any> = [];
-            const {issuerId} = req.params;
+            const { issuerId } = req.params;
             if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
             const checkLock = await checkLockTreeState(issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
 
             for (let i = 0; i < req.body.length; i++) {
@@ -218,12 +217,12 @@ export class ClaimsController {
                     const { holderId, registryId, data } = req.body[i];
                     if (!holderId || !registryId || !data
                         || typeof holderId != "string" || typeof registryId != "string") {
-                            throw("Invalid data");
+                        throw ("Invalid data");
                     }
-        
-                    const {claim, schemaHash} = await createClaim(data, holderId, registryId);
+
+                    const { claim, schemaHash } = await createClaim(data, holderId, registryId);
                     const claimId = await saveClaim(claim, schemaHash, holderId, issuerId, registryId, ClaimStatus.PENDING);
-            
+
                     await saveEntryData(claimId, claim, data, []);
 
                     claimResponse.push(
@@ -232,7 +231,7 @@ export class ClaimsController {
                             claimId: claimId
                         }
                     );
-        
+
                 } catch (err: any) {
                     const error = (buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
                     claimResponse.push(
@@ -252,23 +251,23 @@ export class ClaimsController {
 
     public async revokeListClaims(req: Request, res: Response) {
         try {
-            const {issuerId} = req.params;
+            const { issuerId } = req.params;
             if (issuerId == undefined || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
 
-            const {revNonces} = req.body;
+            const { revNonces } = req.body;
 
             if (revNonces == undefined || revNonces.length == 0) {
                 throw ("Required array revNonces to revoke");
             }
             revNonces.forEach((revNonce: any) => {
                 if (typeof revNonce != "number") {
-                    throw("revNonces must be array number");
+                    throw ("revNonces must be array number");
                 }
             });
             const claims = await setRevokeClaim(revNonces, issuerId);
-            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
+            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, { claims: claims }, ResultMessage.APISUCCESS.message))
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -277,13 +276,13 @@ export class ClaimsController {
 
     public async getPublishChallenge(req: Request, res: Response) {
         try {
-            const {issuerId} = req.params;
+            const { issuerId } = req.params;
             if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
             const checkLock = await checkLockTreeState(issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
             await changeLockTreeState(issuerId, true);
             try {
@@ -295,7 +294,7 @@ export class ClaimsController {
                 return;
             } catch (err: any) {
                 await changeLockTreeState(issuerId, false);
-                throw(err);
+                throw (err);
             }
         } catch (err: any) {
             console.log(err);
@@ -305,13 +304,13 @@ export class ClaimsController {
 
     public async getRevokeChallenge(req: Request, res: Response) {
         try {
-            const {issuerId} = req.params;
+            const { issuerId } = req.params;
             if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
             const checkLock = await checkLockTreeState(issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
             await changeLockTreeState(issuerId, true);
             try {
@@ -323,7 +322,7 @@ export class ClaimsController {
                 return;
             } catch (err: any) {
                 await changeLockTreeState(issuerId, false);
-                throw(err);
+                throw (err);
             }
         } catch (err: any) {
             console.log(err);
@@ -333,13 +332,13 @@ export class ClaimsController {
 
     public async getCombineChallenge(req: Request, res: Response) {
         try {
-            const {issuerId} = req.params;
+            const { issuerId } = req.params;
             if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
             const checkLock = await checkLockTreeState(issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
             await changeLockTreeState(issuerId, true);
             try {
@@ -351,7 +350,7 @@ export class ClaimsController {
                 return;
             } catch (err: any) {
                 await changeLockTreeState(issuerId, false);
-                throw(err);
+                throw (err);
             }
         } catch (err: any) {
             console.log(err);
@@ -361,14 +360,14 @@ export class ClaimsController {
 
     public async publishClaims(req: Request, res: Response) {
         try {
-            const {issuerId} = req.params;
+            const { issuerId } = req.params;
             if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
-            const {signature} = req.body;
+            const { signature } = req.body;
             if (!signature
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
-                throw("Invalid signature");
+                throw ("Invalid signature");
             }
             const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
@@ -379,20 +378,20 @@ export class ClaimsController {
 
             const checkLock = await checkLockTreeState(issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
             await changeLockTreeState(issuerId, true);
             try {
                 const response = await publishOnly(signChallenge, issuerId);
                 res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, { status: response }, ResultMessage.APISUCCESS.message)
                 );
                 await changeLockTreeState(issuerId, false);
                 return;
             } catch (err: any) {
                 await changeLockTreeState(issuerId, false);
-                throw(err);
-            }        
+                throw (err);
+            }
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -401,14 +400,14 @@ export class ClaimsController {
 
     public async revokeClaims(req: Request, res: Response) {
         try {
-            const {issuerId} = req.params;
+            const { issuerId } = req.params;
             if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
-            const {signature} = req.body;
+            const { signature } = req.body;
             if (!signature
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
-                throw("Invalid signature");
+                throw ("Invalid signature");
             }
             const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
@@ -419,21 +418,21 @@ export class ClaimsController {
 
             const checkLock = await checkLockTreeState(issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
             await changeLockTreeState(issuerId, true);
             try {
                 const response = await revokeOnly(signChallenge, issuerId);
                 res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, { status: response }, ResultMessage.APISUCCESS.message)
                 );
                 await changeLockTreeState(issuerId, false);
                 return;
             } catch (err: any) {
                 await changeLockTreeState(issuerId, false);
-                throw(err);
-            }        
-        
+                throw (err);
+            }
+
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -442,14 +441,14 @@ export class ClaimsController {
 
     public async publishAndRevokeClaims(req: Request, res: Response) {
         try {
-            const {issuerId} = req.params;
+            const { issuerId } = req.params;
             if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
+                throw ("Invalid issuerId");
             }
-            const {signature} = req.body;
+            const { signature } = req.body;
             if (!signature
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
-                throw("Invalid signature");
+                throw ("Invalid signature");
             }
             const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
@@ -460,21 +459,21 @@ export class ClaimsController {
 
             const checkLock = await checkLockTreeState(issuerId);
             if (checkLock) {
-                throw("Await Publish!");
+                throw ("Await Publish!");
             }
             await changeLockTreeState(issuerId, true);
             try {
                 const response = await publishAndRevoke(signChallenge, issuerId);
                 res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, { status: response }, ResultMessage.APISUCCESS.message)
                 );
                 await changeLockTreeState(issuerId, false);
                 return;
             } catch (err: any) {
                 await changeLockTreeState(issuerId, false);
-                throw(err);
-            }        
-        
+                throw (err);
+            }
+
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -483,24 +482,24 @@ export class ClaimsController {
 
     public async updateReviewingClaim(req: Request, res: Response) {
         try {
-            const {claimId, status} = req.params;
+            const { claimId, status } = req.params;
             if (!claimId || typeof claimId != "string") {
-                throw("Invalid claimId");
+                throw ("Invalid claimId");
             }
             if (status != ClaimStatus.PENDING && status != ClaimStatus.REJECT) {
-                throw("Status must PENDING or REJECT")
+                throw ("Status must PENDING or REJECT")
             }
-            const claim = await Claim.find({"id": claimId, "status": ClaimStatus.REVIEWING});
+            const claim = await Claim.find({ "id": claimId, "status": ClaimStatus.REVIEWING });
             if (claim.length == 0) {
-                throw("Claim not REVIEWING");
+                throw ("Claim not REVIEWING");
             }
             for (let i = 0; i < claim.length; i++) {
                 claim[i].status = status;
                 await claim[i].save();
             }
             res.send(
-                buildResponse(ResultMessage.APISUCCESS.apiCode, {claimId: claimId, status: status}, ResultMessage.APISUCCESS.message)
-            );        
+                buildResponse(ResultMessage.APISUCCESS.apiCode, { claimId: claimId, status: status }, ResultMessage.APISUCCESS.message)
+            );
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -512,17 +511,17 @@ export class ClaimsController {
             const { issuerId } = req.params;
             const token = req.headers.authorization;
             if (!issuerId) {
-                throw("Invalid issuer")
+                throw ("Invalid issuer")
             }
             if (!token) {
-                throw("Invalid token");
+                throw ("Invalid token");
             }
             const verifyToken = await verifyTokenAdmin(token, issuerId);
             if (!verifyToken) {
-                throw("Invalid token");
+                throw ("Invalid token");
             }
 
-            let {status, holderId, schemaHash, claimId} = req.query;
+            let { status, holderId, schemaHash, claimId } = req.query;
             if (!status) {
                 status = [];
             }
@@ -543,7 +542,7 @@ export class ClaimsController {
             }
 
             if (typeof issuerId != "string" || typeof holderId != "string" || typeof schemaHash != "string") {
-                throw("Invalid query input");
+                throw ("Invalid query input");
             }
             const claims = await queryClaimAndRawData(issuerId, status as string[], holderId, schemaHash, claimId as string[]);
             res.send(
@@ -554,7 +553,7 @@ export class ClaimsController {
         }
     }
 
-    public async holderRetriveAllClaim(req: Request, res: Response) {
+    public async holderRetrieveAllClaim(req: Request, res: Response) {
         try {
             const { userId } = req.params;
             const claimEncode = await holderGetAllClaim(userId);

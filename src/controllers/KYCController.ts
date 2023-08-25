@@ -11,7 +11,7 @@ export class KYCController {
             res.send(
                 buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message)
             );
-            
+
         } catch (err: any) {
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
@@ -21,11 +21,11 @@ export class KYCController {
         try {
             const { userId, pubkeyX, pubkeyY, publicKey } = req.body;
             if (typeof userId != 'string' || typeof pubkeyX != 'string' || typeof pubkeyY != 'string' || typeof publicKey != 'string') {
-                throw('Invalid data');
+                throw ('Invalid data');
             }
 
             await registerDIDToContract(userId, pubkeyX, pubkeyY, publicKey);
-            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, {userId: userId, pubkeyX: pubkeyX, pubkeyY: pubkeyY, publicKey: publicKey}, ResultMessage.APISUCCESS.message))
+            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, { userId: userId, pubkeyX: pubkeyX, pubkeyY: pubkeyY, publicKey: publicKey }, ResultMessage.APISUCCESS.message))
         } catch (err: any) {
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
@@ -35,7 +35,7 @@ export class KYCController {
         try {
             const { userId } = req.params;
             if (!userId || typeof userId != 'string') {
-                throw('Invalid userId');
+                throw ('Invalid userId');
             }
 
             const didResolve = await resolveDID(userId);

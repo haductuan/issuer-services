@@ -1,6 +1,6 @@
 import axios from "axios";
 import { v4 } from "uuid";
-import { ZIDEN_SERVER_URI } from "../common/config/secrets.js";
+import { PROOF_VALID_TIME, QUERY_MTP_VALIDATOR, RPC_PROVIDER, ZIDEN_SERVER_URI } from "../common/config/secrets.js";
 import Claim from "../models/Claim.js";
 import Issuer from "../models/Issuer.js";
 import Network from "../models/Network.js";
@@ -9,8 +9,12 @@ import SchemaRegistry, { IRequirement } from "../models/SchemaRegistry.js";
 import { utils as zidenjsUtils, query as zidenjsQuery, schema as zidenjsSchema } from "@zidendev/zidenjs";
 import { parseBigInt } from "../util/utils.js";
 import { getPrimitiveSchema, getSchemaBySchemaHash } from "./Schema.js";
+import { GlobalVariables } from "../common/config/global.js";
+import ProofRequest from "../models/ProofRequest.js";
+import fs from "fs-extra";
+import { ethers } from "ethers";
 
-export async function createNewRegistry(schemaHash: string, issuerId: string, description: string, expiration: number, updateble: boolean, networkId: number, endpointUrl: string, requirements: Array<IRequirement>) {    
+export async function createNewRegistry(schemaHash: string, issuerId: string, description: string, expiration: number, updateble: boolean, networkId: number, endpointUrl: string, requirements: Array<IRequirement>) {
     if (!schemaHash) {
         schemaHash = "";
     }
@@ -36,21 +40,21 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
     }
 
     if (!expiration) {
-        expiration = 10*365*24*60*60*60*1000;
+        expiration = 10 * 365 * 24 * 60 * 60 * 60 * 1000;
     }
 
-    const schema = await Schema.findOne({"@hash": schemaHash});
+    const schema = await Schema.findOne({ "@hash": schemaHash });
     let schemaName = "";
     if (schema) {
         schemaName = schema["@name"];
     }
 
-    const issuer = await Issuer.findOne({issuerId: issuerId});
+    const issuer = await Issuer.findOne({ issuerId: issuerId });
     if (!issuer) {
-        throw("issuerId not exist!");
+        throw ("issuerId not exist!");
     }
-    
-    const networkSchema = await Network.findOne({networkId: networkId});
+
+    const networkSchema = await Network.findOne({ networkId: networkId });
     let networkName = "";
     if (networkSchema && networkSchema.name != undefined) {
         networkName = networkSchema.name;
@@ -110,10 +114,10 @@ export async function findSchemaRegistry(schemaHash: string, issuerId: string, n
     for (let i = 0; i < registries.length; i++) {
         let registry = registries[i];
 
-        const numClaims = await Claim.countDocuments({"schemaRegistryId": registry.id});
+        const numClaims = await Claim.countDocuments({ "schemaRegistryId": registry.id });
         let network;
-        network = await Network.findOne({networkId: registry.networkId});
-        const schema = await Schema.findOne({"@hash": registry.schemaHash});
+        network = await Network.findOne({ networkId: registry.networkId });
+        const schema = await Schema.findOne({ "@hash": registry.schemaHash });
 
         if (network == undefined) {
             network = {
@@ -147,30 +151,30 @@ export async function findSchemaRegistry(schemaHash: string, issuerId: string, n
 }
 
 export async function updateRegistry(registryId: string, schemaHash: string, issuerId: string, description: string, expiration: number, updateble: boolean, networkId: number, endpointUrl: string) {
-    const registry = await SchemaRegistry.findOne({id: registryId});
+    const registry = await SchemaRegistry.findOne({ id: registryId });
     if (!registry) {
-        throw("registryId not exist!");
+        throw ("registryId not exist!");
     }
 
-    const schema = await Schema.findOne({"@hash": schemaHash});
+    const schema = await Schema.findOne({ "@hash": schemaHash });
     if (!schema) {
-        throw("schemaHash not exist!");
+        throw ("schemaHash not exist!");
     }
 
-    const issuer = await Issuer.findOne({issuerId: issuerId});
+    const issuer = await Issuer.findOne({ issuerId: issuerId });
     if (!issuer) {
-        throw("issuerId not exist!");
+        throw ("issuerId not exist!");
     }
 
-    const network = await Network.findOne({networkId: networkId});
+    const network = await Network.findOne({ networkId: networkId });
     if (!network) {
-        throw("networkId not exist!");
+        throw ("networkId not exist!");
     }
 
     if (expiration == 0) {
-        expiration = 10*365*24*60*60*60*1000;
+        expiration = 10 * 365 * 24 * 60 * 60 * 60 * 1000;
     }
-    
+
     registry.schemaHash = schemaHash;
     registry.issuerId = issuerId;
     registry.description = description;
@@ -184,9 +188,9 @@ export async function updateRegistry(registryId: string, schemaHash: string, iss
 }
 
 export async function changeStatusRegistry(registryId: string, status: boolean) {
-    const registry = await SchemaRegistry.findOne({id: registryId});
+    const registry = await SchemaRegistry.findOne({ id: registryId });
     if (!registry) {
-        throw("registryId not exist!");
+        throw ("registryId not exist!");
     }
 
     registry.isActive = status;
@@ -195,9 +199,9 @@ export async function changeStatusRegistry(registryId: string, status: boolean) 
 }
 
 export async function getRegistryRequirement(registryId: string) {
-    const registry = await SchemaRegistry.findOne({id: registryId});
+    const registry = await SchemaRegistry.findOne({ id: registryId });
     if (!registry) {
-        throw("registry not exist!");
+        throw ("registry not exist!");
     }
 
     if (!registry.requirements) {
@@ -224,13 +228,20 @@ export async function checkProof(zkProofs: Array<Proof>, registryId: string) {
                 const issuerId = BigInt(zkProofs[i].publicData[4]).toString(16);
                 const deterministicValue = zkProofs[i].publicData[10];
                 const operator = zkProofs[i].publicData[9];
-                const value = zidenjsQuery.calculateDeterministicValue(parseBigInt(requirement.query.value), 6, requirement.query.operator).toString(10);
+                const challenge = zkProofs[i].publicData[2];
+                const proofRequest = await ProofRequest.findOne({ challenge: challenge, registryId: registryId });
+                if (!proofRequest) {
+                    continue;
+                }
+                const date = Number(new Date());
+                if (proofRequest.valid && date > proofRequest.valid) {
+                    continue;
+                }
 
                 if (schemaHash != requirement.schemaHash
                     || !requirement.allowedIssuers.includes(issuerId)
                     || operator != requirement.query.operator.toString()
-                    || value != deterministicValue)
-                {
+                ) {
                     continue;
                 } else {
                     try {
@@ -249,6 +260,10 @@ export async function checkProof(zkProofs: Array<Proof>, registryId: string) {
                         if (mask.toString() != zkProofs[i].publicData[11]) {
                             continue;
                         }
+                        const value = zidenjsQuery.calculateDeterministicValue(parseBigInt(requirement.query.value), 6, requirement.query.operator, begin).toString(10);
+                        if (value != deterministicValue) {
+                            continue;
+                        }
                     } catch (err: any) {
                     }
 
@@ -260,21 +275,9 @@ export async function checkProof(zkProofs: Array<Proof>, registryId: string) {
                 return false;
             }
         }
-
-        const response = (await axios.request({
-            url: `${ZIDEN_SERVER_URI}/api/v1/proofs/verify`,
-            method: 'post',
-            data: {
-                networkId: "97",
-                zkProofs: zkProofs
-            }
-        })).data;
-
-        if (response.isValid == true) {
-            return true;
-        } else {
-            return false;
-        }
+        
+        const response = await checkProofOnchain(zkProofs);
+        return response;
 
     } catch (err: any) {
         console.log(err)
@@ -288,11 +291,11 @@ export async function getRegistryById(registryId: string) {
     });
 
     if (!registry) {
-        throw("Registry not existed!");
+        throw ("Registry not existed!");
     }
 
 
-    const schema = await Schema.findOne({"@hash": registry.schemaHash});
+    const schema = await Schema.findOne({ "@hash": registry.schemaHash });
     let schemaName = "";
     if (schema) {
         schemaName = schema["@name"];
@@ -317,4 +320,83 @@ export async function getRegistryById(registryId: string) {
         },
         requirements: registry.requirements
     };
+}
+
+export async function generateChallange(registryId: string) {
+    const registry = await SchemaRegistry.findOne({
+        id: registryId
+    });
+
+    if (!registry) {
+        throw ("RegistryId not exist!");
+    }
+
+    const requestId = v4();
+    const hashData = GlobalVariables.F.toObject(GlobalVariables.hasher([BigInt(zidenjsUtils.stringToHex(requestId))])).toString(2);
+    let bitRemove = hashData.length < 125 ? 0 : hashData.length - 125;
+    let hashDataFixed = BigInt('0b' + hashData.slice(0, hashData.length - bitRemove));
+    let value = BigInt(hashDataFixed).toString(10);
+
+    const newProofRequest = new ProofRequest({
+        id: value,
+        registryId: registryId,
+        challenge: value,
+        valid: Number(new Date()) + PROOF_VALID_TIME
+    });
+
+    await newProofRequest.save();
+
+    return value;
+}
+
+export async function checkProofOnchain(zkProofs: Array<Proof>) {
+    try {
+        const queryMtpAbi = JSON.parse(fs.readFileSync("src/abis/QueryMTPValidator.json", "utf-8"));
+        const queryContract = new ethers.Contract(
+            QUERY_MTP_VALIDATOR,
+            queryMtpAbi,
+            new ethers.providers['JsonRpcProvider'](RPC_PROVIDER)
+        );
+
+        for (let i = 0; i < zkProofs.length; i++) {
+            const { proof, publicData } = zkProofs[i];
+            const circuitQuery = {
+                deterministicValue: publicData[10],
+                mask: publicData[11],
+                claimSchema: publicData[7],
+                timestamp: publicData[6],
+                slotIndex: publicData[8],
+                operator: publicData[9]
+            }
+            const callData: any = {
+                a: [p256(proof.pi_a[0]), p256(proof.pi_a[1])],
+                b: [[p256(proof.pi_b[0][1]), p256(proof.pi_b[0][0])], [p256(proof.pi_b[1][1]), p256(proof.pi_b[1][0])]],
+                c: [p256(proof.pi_c[0]), p256(proof.pi_c[1])],
+                inputs: publicData.map((e: any) => p256(e))
+            }
+            const check = await queryContract.verify(
+                callData.a,
+                callData.b,
+                callData.c,
+                callData.inputs,
+                circuitQuery
+            );
+
+            if (!check) {
+                return false;
+            }
+        }
+
+    } catch (err: any) {
+        console.log(err);
+        return false;
+    }
+    
+    return true;
+}
+
+function p256(n: any) {
+    let nstr = Buffer.from(n, 'utf-8').toString();
+    while (nstr.length < 64) nstr = "0"+nstr;
+    return ethers.BigNumber.from(nstr);
 }

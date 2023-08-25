@@ -13,12 +13,12 @@ enum Role {
   Operator = "2"
 }
 const schemaHash = "123456789";
-const timeLimit = 3600000*24*3;
+const timeLimit = 3600000 * 24 * 3;
 
 export class AuthenController {
   async authentication(req: Request, res: Response, next: NextFunction) {
     try {
-      const {issuerId} = req.params;
+      const { issuerId } = req.params;
       const token = await login(req.body, issuerId);
       res.status(200).send({ token: token });
       return token;
@@ -29,8 +29,8 @@ export class AuthenController {
   }
   async authorization(req: Request, res: Response, next: NextFunction) {
     try {
-      const {issuerId} = req.params;
-      if (!issuerId ) {
+      const { issuerId } = req.params;
+      if (!issuerId) {
         res.send(buildErrorMessage(200, "IssuerId invalid", "Unable to login"));
         return;
       }
@@ -40,14 +40,14 @@ export class AuthenController {
         return;
       }
       if (typeof token != "string") {
-        throw("Invalid token");
+        throw ("Invalid token");
       }
       let isValid = await verifyTokenAdmin(token, issuerId);
       if (!isValid) {
         isValid = await verfifyTokenWithRole(token, issuerId, 2);
       }
       if (!isValid) {
-        throw("Invalid token");
+        throw ("Invalid token");
       } else {
         next();
         return;
@@ -60,8 +60,8 @@ export class AuthenController {
 
   async authorizationAdmin(req: Request, res: Response, next: NextFunction) {
     try {
-      const {issuerId} = req.params;
-      if (!issuerId ) {
+      const { issuerId } = req.params;
+      if (!issuerId) {
         res.send(buildErrorMessage(200, "IssuerId invalid", "Unable to login"));
         return;
       }
@@ -71,11 +71,11 @@ export class AuthenController {
         return;
       }
       if (typeof token != "string") {
-        throw("Invalid token");
+        throw ("Invalid token");
       }
       const isValid = await verifyTokenAdmin(token, issuerId);
       if (!isValid) {
-        throw("Invalid token");
+        throw ("Invalid token");
       } else {
         next();
         return;
@@ -88,14 +88,14 @@ export class AuthenController {
 
   async verifyToken(req: Request, res: Response) {
     try {
-      const {issuerId} = req.params;
+      const { issuerId } = req.params;
       if (!issuerId || typeof issuerId != "string") {
         res.send(buildErrorMessage(400, "IssuerId invalid", "Unable to login"));
         return;
       }
-      let {token} = req.body;
+      let { token } = req.body;
       if (!token || typeof token != "string") {
-        throw("Invalid token");
+        throw ("Invalid token");
       }
 
       let isValid = await verifyTokenAdmin(token, issuerId);
@@ -103,12 +103,12 @@ export class AuthenController {
         isValid = await verfifyTokenWithRole(token, issuerId, 2);
       }
       res.send(
-        buildResponse(ResultMessage.APISUCCESS.apiCode, {isValid: isValid}, ResultMessage.APISUCCESS.message)
+        buildResponse(ResultMessage.APISUCCESS.apiCode, { isValid: isValid }, ResultMessage.APISUCCESS.message)
       );
     } catch (err: any) {
       res.send(
-        buildResponse(ResultMessage.APISUCCESS.apiCode, {isValid: false}, ResultMessage.APISUCCESS.message)
-      );      
+        buildResponse(ResultMessage.APISUCCESS.apiCode, { isValid: false }, ResultMessage.APISUCCESS.message)
+      );
       return;
     }
   }
@@ -129,7 +129,7 @@ export class AuthenController {
       const response = await getAuthenProof(claimId, type);
       res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message));
 
-    } catch(err: any) {
+    } catch (err: any) {
       console.log(err);
       res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
     }

@@ -2670,6 +2670,59 @@
         }
       }
     },
+    "/api/v1/registries/{registryId}/challenge": {
+      "get": {
+        "operationId": "registries-7",
+        "security": [],
+        "tags": [
+          "registries"
+        ],
+        "summary": "Get challenge for generate zk proof",
+        "description": "Get challenge for generate zk proof",
+        "parameters": [
+          {
+            "name": "registryId",
+            "in": "path",
+            "description": "Id of registry service",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Challenge for generate zk proof",
+                  "properties": {
+                    "challenge": {
+                      "type": "string",
+                      "description": "Challenge for generate zk proof",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/registries/requirements": {
       "post": {
         "operationId": "registries-5",
@@ -3204,6 +3257,7 @@
           "@name": "Basic course certificate",
           "@type": "schema",
           "@context": [],
+          "@required": [],
           "certificate-id": {
             "@id": "std-pos:idx-1",
 		        "@type": "std:str"

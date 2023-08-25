@@ -1,0 +1,31 @@
+{
+    "@name": "Driving Licence",
+    "@type": "schema",
+    "@context": [
+        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/contexts/country-code-iso-3166.json"
+    ],
+    "full-name": {
+        "@id": "std-pos:val-1",
+        "@type": "std:str"
+    },
+    "nationality": {
+        "@id": "std-pos:val-2",
+        "@type": "cc3166:numeric-code"
+    },
+    "class": {
+        "@id": "std-pos:idx-1",
+        "@type": "std:int",
+        "@values": [1, 2, 3, 4, 5, 6],
+        "@display": ["B1", "B2", "C", "D", "E", "F"]
+    },
+    "expires": {
+        "@id": "std-pos:idx-2",
+        "@type": "std:date"
+    },
+    "@required": [
+        "full-name",
+        "nationality",
+        "class",
+        "expires"
+    ]
+}

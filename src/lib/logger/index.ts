@@ -1,15 +1,5 @@
 import winston from "winston";
-import {isProduction} from "../../common/config/secrets.js";
-
-// const colors = {
-//     error: 'red',
-//     warn: 'yellow',
-//     info: 'green',
-//     http: 'magenta',
-//     debug: 'white',
-// }
-
-// winston.addColors(colors)
+import { isProduction } from "../../common/config/secrets.js";
 
 const logger = winston.createLogger({
     level: 'debug',
@@ -21,16 +11,16 @@ const logger = winston.createLogger({
             (info) => `${info.timestamp} ${info.level}: ${info.message}`,
         ),
     ),
-    transports: isProduction? [
+    transports: isProduction ? [
         new winston.transports.Console(),
         new winston.transports.File({
             filename: 'logs/error.log',
             level: 'error',
         }),
         new winston.transports.File({ filename: 'logs/all.log' }),
-    ]: [
+    ] : [
         new winston.transports.Console(),
     ],
 })
-  
+
 export default logger

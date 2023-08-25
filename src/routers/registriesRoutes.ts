@@ -18,5 +18,6 @@ export class RegistriesRoutes {
         this.router.put("/:registryId/activate", this.registriesController.changeStatusSchemaRegistry);
         this.router.post("/requirements", this.registriesController.checkProofRequirement);
         this.router.get("/:registryId", this.registriesController.getRegistryById);
+        this.router.get("/:registryId/challenge", this.registriesController.generateChallengeForProof);
     }
 }

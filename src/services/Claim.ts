@@ -286,7 +286,7 @@ export async function holderGetAllClaim(userId: string) {
         for (let i = 0; i < listClaim.length; i++) {
             const entry = await Entry.findOne({claimId: listClaim[i].id});
             if (entry != undefined) {
-                // encode claim
+                // encode claim by user public key
                 const data = {
                     claimId: entry.claimId,
                     rawData: JSON.parse(entry.rawData ?? ""),

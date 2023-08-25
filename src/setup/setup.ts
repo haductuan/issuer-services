@@ -53,6 +53,7 @@ export async function setupSchemaRegistry() {
             try {
                 await createNewSchema(vnidSchema);
             } catch (err) {
+                console.log(err)
             }
 
             let schema = await Schema.findOne({"@hash": getSchemaHashFromSchema(vnidSchema)})

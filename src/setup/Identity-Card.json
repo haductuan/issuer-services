@@ -1,0 +1,48 @@
+{
+    "@name": "Vietname Identity",
+    "@type": "schema",
+    "@context": [
+        "https://raw.githubusercontent.com/hatuank97lhp/schema-models/main/json/contexts/us-document-id.json",
+        "https://raw.githubusercontent.com/hatuank97lhp/schema-models/main/json/contexts/country-code-iso-3166.json"
+    ],
+    "@required": [
+        "id-card",
+        "full-name",
+        "date-of-birth",
+        "nationality",
+        "place-of-origin",
+        "place-of-residence"
+    ],
+    "no": {
+        "@id": "std-pos:idx-1",
+        "@type": "std:str"
+    },
+    "full-name": {
+        "@id": "std-pos:idx-1",
+        "@type": "std:str"
+    },
+    "date-of-birth": {
+        "@id": "std-pos:idx-2",
+        "@type": "std:date"
+    },
+    "sex": {
+        "@id": "std-pos:idx-2",
+        "@type": "usdi:gender"
+    },
+    "nationality": {
+        "@id": "std-pos:val-1",
+        "@type": "cc3166:numeric-code"
+    },
+    "place-of-origin": {
+        "@id": "std-pos:val-1",
+        "@type": "std:str"
+    },
+    "place-of-residence": {
+        "@id": "std-pos:val-2",
+        "@type": "std:str"
+    },
+    "date-of-expiry": {
+        "@id": "std-pos:val-2",
+        "@type": "std:date"
+    }
+}

@@ -1,0 +1,162 @@
+{
+    "@name": "Health Insurance Card",
+    "@type": "schema",
+    "@context": [
+        "https://raw.githubusercontent.com/hatuank97lhp/schema-models/main/json/contexts/us-document-id.json",
+        "https://raw.githubusercontent.com/hatuank97lhp/schema-models/main/json/contexts/country-code-iso-3166.json"
+    ],
+    "@required": [
+        "code",
+        "level",
+        "province-code",
+        "identity",
+        "full-name",
+        "date-of-birth",
+        "gender",
+        "permanent-residence",
+        "registerd-hospital",
+        "valid-from"
+    ],
+    "code": {
+        "@id": "std-pos:idx-1",
+        "@type": "std:int",
+        "@values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43
+        ],
+        "@display": [
+            "DN",
+            "HX",
+            "CH",
+            "NN",
+            "TK",
+            "HC",
+            "XK",
+            "HT",
+            "TB",
+            "NO",
+            "CT",
+            "XB",
+            "TN",
+            "CS",
+            "QN",
+            "CA",
+            "CY",
+            "XN",
+            "MS",
+            "CC",
+            "CK",
+            "CB",
+            "KC",
+            "HD",
+            "TE",
+            "BT",
+            "HN",
+            "DT",
+            "DK",
+            "XD",
+            "TS",
+            "TC",
+            "TQ",
+            "TA",
+            "TY",
+            "HG",
+            "LS",
+            "PV",
+            "CN",
+            "HS",
+            "SV",
+            "GB",
+            "GD"
+        ]
+    },
+    "level": {
+        "@id": "std-pos:idx-1",
+        "@type": "std:int",
+        "@values": [
+            1,
+            2,
+            3,
+            4
+        ],
+        "@display": [
+            "1",
+            "2",
+            "3",
+            "4"
+        ]
+    },
+    "province-code": {
+        "@id": "std-pos:idx-1",
+        "@type": "sdt:int"
+    },
+    "identity": {
+        "@id": "std-pos:idx-1",
+        "@type": "std:int"
+    },
+    "full-name": {
+        "@id": "std-pos:idx-2",
+        "@type": "std:str"
+    },
+    "date-of-birth": {
+        "@id": "std-pos:idx-2",
+        "@type": "std:date"
+    },
+    "gender": {
+        "@id": "std-pos:idx-2",
+        "@type": "usdi:gender"
+    },
+    "permanent-residence": {
+        "@id": "std-pos:val-1",
+        "@type": "std:str"
+    },
+    "registerd-hospital": {
+        "@id": "std-pos:val-1",
+        "@type": "std:str"
+    },
+    "valid-from": {
+        "@id": "std-pos:val-2",
+        "@type": "std:date"
+    }
+}
